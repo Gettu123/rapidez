@@ -1,0 +1,19 @@
+ESTADO ACTUAL DEL PROYECTO:
+1. Base de Datos configurada: Ya creé mi cuenta en Supabase, activé la extensión PostGIS y ejecuté el script SQL para crear las tablas 'drivers' y 'trips'. Ya tengo a la mano mi Connection String (DATABASE_URL con URI).
+2. Servidor Backend en la nube: Ya tengo mi cuenta lista en Render.com para alojar la API Node.js con WebSockets en su plan gratuito.
+3. Modelo de negocio y mapa: Usaremos OpenStreetMap (flutter_map / OSRM o MapLibre) para que sea 100% gratuito sin tarjetas de crédito, registro de conductores con verificación manual de documentos vía WhatsApp y soporte de Pago Móvil / Efectivo.
+
+LO QUE NECESITO QUE HAGAS A PARTIR DE AHORA:
+1. Creación de Ficheros del Backend: 
+◦ Guiarme paso a paso para crear el repositorio en GitHub y colocar los archivos exactos (package.json y server.js) con la lógica de Socket.io, registro de motorizados y actualización de coordenadas en PostGIS.
+◦ Decirme exactamente cómo vincular ese repositorio con Render.com y colocar la variable de entorno DATABASE_URL que obtuve de Supabase para que el backend quede público (con su URL HTTPS/WSS).
+
+2. Aplicación Móvil del Conductor (apps/driver_app en Flutter): 
+◦ Proporcionarme la estructura completa del proyecto en Flutter.
+◦ Incluir la pantalla de registro con botón directo que abra WhatsApp hacia el administrador adjuntando la plantilla para enviar fotos de Cédula, Carnet de Circulación y selfie.
+◦ Integrar el servicio de rastreo de GPS en segundo plano (flutter_background_service) conectado a los WebSockets de Render.
+
+3. Compilación de APK de Prueba: 
+◦ Indicarme los comandos exactos para compilar el APK de prueba del motorizado (driver-release.apk) optimizado y ligero para probarlo directamente en un teléfono Android.
+
+Por favor, revisa el PDF adjunto y comienza guiándome con el primer paso: la estructura final del backend para subirlo a GitHub y desplegarlo en Render.

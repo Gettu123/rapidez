@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Rapidez — Mototaxi en Carora",
+      "hasCanvas": false,
+      "bodyTextLen": 404,
+      "bodyTextHash": "161e0286dce25de309e496267e9457cbdcfe6e9f8b1e910b1c1dd136dfdaf196",
+      "bodyTextPrefix": "RAPIDEZ Pasajero Conductor CARORA · LARA ¿Dónde te buscamos? Mue",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Rapidez — Mototaxi en Carora",
+      "hasCanvas": false,
+      "bodyTextLen": 343,
+      "bodyTextHash": "728338d96e173d7318e231897ce740873387b9a21aa27ebc457f9b90a9058f65",
+      "bodyTextPrefix": "RAPIDEZ Pasajero Conductor CARORA · LARA ¿Dónde te buscamos? Mue",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

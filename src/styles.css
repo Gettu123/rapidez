@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Figtree", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Syne", "Figtree", sans-serif;
+  --color-ink: #1a1c14;
+  --color-paper: #f4efe4;
+  --color-sheet: #fffaf3;
+  --color-brand: #e6a100;
+  --color-muted: #6e685c;
+  --color-line: #e3dac8;
+  --color-signal: #c4392c;
+  --color-map: #c5d0c0;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    margin: 0;
+    background: var(--color-ink);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+.stage {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ink);
+}
+
+.phone {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-map);
+}
+
+.stage-note {
+  display: none;
+}
+
+.sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  max-height: 76%;
+  overflow: auto;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: var(--color-sheet);
+  color: var(--color-ink);
+  box-shadow: 0 -12px 40px rgb(26 28 20 / 0.16);
+}
+
+.sheet-in {
+  animation: rise 200ms ease-out;
+}
+
+.center-pin {
+  position: absolute;
+  left: 50%;
+  z-index: 20;
+  top: max(4.5rem, calc((100% - var(--sheet, 16rem)) / 2));
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-signal);
+  filter: drop-shadow(0 6px 8px rgb(26 28 20 / 0.25));
+}
+
+.zoom-stack {
+  position: absolute;
+  top: 4.25rem;
+  right: 0.75rem;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--color-map);
+  font-family: var(--font-sans);
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  line-height: 1.3;
+  max-width: 58%;
+  background: color-mix(in srgb, var(--color-paper) 90%, transparent);
+  color: var(--color-muted);
+}
+
+.moto-icon {
+  background: transparent;
+  border: 0;
+}
+
+.moto-pin {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-brand);
+  color: var(--color-ink);
+  box-shadow: 0 8px 18px rgb(26 28 20 / 0.28);
+}
+
+.moto-pin svg {
+  transform: rotate(var(--rot, 0deg));
+}
+
+.field {
+  height: 3rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  padding: 0 0.75rem;
+  font-size: 1rem;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.field:focus {
+  border-color: var(--color-ink);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (min-width: 840px) {
+  .stage {
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  .phone {
+    width: 420px;
+    height: min(880px, calc(100dvh - 5.5rem));
+    border-radius: 1.75rem;
+    box-shadow: 0 24px 70px rgb(0 0 0 / 0.38);
+  }
+  .stage-note {
+    display: block;
+    color: var(--color-paper);
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in {
+    animation: none;
+  }
+}

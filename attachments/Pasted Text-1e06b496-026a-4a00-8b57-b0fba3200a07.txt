@@ -1,0 +1,31 @@
+Atue como um Arquiteto de Software e Desenvolvedor Sênior Full-Stack especializado em Flutter, Node.js e sistemas em tempo real.
+
+Preciso criar uma plataforma completa de mototáxi chamada "Rapidez", inspirada no modelo Uber Moto / 99Moto, adaptada especificamente para a cidade de Carora (Estado Lara, Venezuela).
+
+O projeto é composto por 2 aplicativos móveis distintos e 1 backend central:
+
+1. APLICATIVO DO PASSAGEIRO (Flutter - passenger_app):
+- Mapa interativo (Google Maps / Mapbox) com marcador central fixo (pin) para selecionar o ponto de recolha e destino.
+- Campo obrigatório de texto para "Ponto de Referência Local" em Carora (ex.: "em frente à farmácia", "portão branco ao lado da praça").
+- Seleção de forma de pagamento: Dinheiro (USD / Bs) e Pago Móvil.
+- Rastreamento em tempo real da moto no mapa, com interpolação linear suave (lerp) do marcador e rota traçada via Polyline.
+- Tela com modal para copiar dados bancários do motorista (Banco, Telefone, Cédula/RIF) e campo para enviar o número de comprovante/referência do Pago Móvil.
+
+2. APLICATIVO DO MOTOTAXISTA (Flutter - driver_app):
+- Botão/Switch para alternar entre "Em Linha" (disponível) e "Desconectado".
+- Rastreamento de GPS em segundo plano contínuo (foreground service via flutter_background_service e geolocator) para transmitir localização mesmo com tela bloqueada ou enquanto usa Waze/Google Maps.
+- Pop-up com alerta sonoro e contador regressivo de 15 segundos para aceitar ou rejeitar corridas próximas.
+- Painel para cadastrar dados de Pago Móvil e botão para validar o pagamento antes de finalizar o serviço.
+
+3. BACKEND & INFRAESTRUTURA (Node.js + Socket.io + PostgreSQL/PostGIS + Redis):
+- docker-compose.yml pronto com PostgreSQL 15/16 + extensão PostGIS e Redis.
+- Schema SQL completo com índices espaciais (GIST) e query usando ST_DWithin para buscar motoristas disponíveis em raio de 3 a 3.5 km.
+- Comunicação via Socket.io com eventos: driver_connect, update_location, request_trip, accept_trip, driver_position_changed.
+- Cálculo de distância via fórmula de Haversine para emitir notificação Push via Firebase Cloud Messaging (FCM) quando o motoqueiro estiver a menos de 100 metros do passageiro.
+
+Por favor, forneça:
+1. A arquitetura de pastas do monorepo (apps/passenger_app, apps/driver_app, backend).
+2. O arquivo docker-compose.yml e o schema SQL com PostGIS.
+3. O código principal do backend (server.js) com os eventos Socket.io e a lógica de despacho.
+4. O código Flutter do serviço de tracking em background para o motorista e o widget de mapa animado com Polyline para o passageiro.
+5. Um passo a passo prático de execução e teste em ambiente local.
