@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import type { Map as LeafletMap, LayerGroup, Marker, Polyline } from "leaflet";
 import { HOME } from "@/lib/rapidez/data";
 import { bearing } from "@/lib/rapidez/geo";
-import { listNearby } from "@/lib/rapidez/engine";
 import { useRapidez } from "@/lib/rapidez/store";
 
 const MOTO_HTML = `<div class="moto-pin"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.2" cy="16.5" r="2.4"/><circle cx="17.8" cy="16.5" r="2.4"/><path d="M6.2 16.5h2.2l1.8-4.6h4.6l1.7 2.8h1.3"/><path d="M10.2 11.9 8.4 8.2H6.4"/></svg></div>`;
@@ -144,16 +143,16 @@ export function MapCanvas() {
         const showFleet = selecting || s.phase === "confirm" || s.phase === "searching";
         dots.clearLayers();
         if (showFleet) {
-          const origin = s.pickup ?? s.center;
-          for (const d of listNearby(origin, s.online)) {
+          for (const d of s.fleet) {
             if (s.assigned && d.id === s.assigned.id) continue;
-            L.circleMarker([d.pos.lat, d.pos.lng], {
-              radius: 6,
+            const mark = L.circleMarker([d.lat, d.lng], {
+              radius: d.elite ? 8 : 6,
               color: ink,
               weight: 2,
-              fillColor: brand,
+              fillColor: d.elite ? brand : paper,
               fillOpacity: 1,
             }).addTo(dots);
+            mark.bindTooltip(`${d.name} · Catastrado${d.elite ? " · Élite" : ""}`, { direction: "top" });
           }
         }
 
@@ -183,7 +182,8 @@ export function MapCanvas() {
           pickupMark = null;
         }
 
-        if (s.dest && (s.phase === "confirm" || s.phase === "riding" || s.phase === "pay" || s.phase === "done" || s.phase === "enroute" || s.phase === "arrived" || s.phase === "searching")) {
+        const quoting = s.phase === "pickup" && s.route.length > 1;
+        if (s.dest && (quoting || s.phase === "confirm" || s.phase === "riding" || s.phase === "pay" || s.phase === "done" || s.phase === "enroute" || s.phase === "arrived" || s.phase === "searching")) {
           if (!destMark) {
             destMark = L.circleMarker([s.dest.lat, s.dest.lng], {
               radius: 7,
@@ -207,7 +207,7 @@ export function MapCanvas() {
           driver = null;
         }
 
-        if (s.phase === "enroute" || s.phase === "riding") drawRoute(s.route);
+        if (s.phase === "enroute" || s.phase === "riding" || (s.phase === "pickup" && s.route.length > 1)) drawRoute(s.route);
         else drawRoute([]);
 
         if (s.mapCmd && s.mapCmd.seq !== lastCmd) {

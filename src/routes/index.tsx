@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RapidezApp } from "@/components/rapidez/RapidezApp";
+import { LiveApp } from "@/components/rapidez/LiveApp";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
   return (
     <main className="stage">
-      <RapidezApp />
-      <p className="stage-note">Misma carrera, dos roles. Cambia entre pasajero y conductor.</p>
+      <LiveApp />
+      <p className="stage-note">Un destino. Primero la moto más cercana, 18 segundos.</p>
     </main>
   );
 }

@@ -7,9 +7,9 @@
       "status": 200,
       "title": "Rapidez — Mototaxi en Carora",
       "hasCanvas": false,
-      "bodyTextLen": 404,
-      "bodyTextHash": "161e0286dce25de309e496267e9457cbdcfe6e9f8b1e910b1c1dd136dfdaf196",
-      "bodyTextPrefix": "RAPIDEZ Pasajero Conductor CARORA · LARA ¿Dónde te buscamos? Mue",
+      "bodyTextLen": 220,
+      "bodyTextHash": "3227976b4f79b53fc4a76c456a89058610a09836a20e69b3a55ca0d9a2b48916",
+      "bodyTextPrefix": "RAPIDEZ RAPIDEZ Crear cuenta Una cuenta, un teléfono. Pasajero o",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
@@ -21,9 +21,9 @@
       "status": 200,
       "title": "Rapidez — Mototaxi en Carora",
       "hasCanvas": false,
-      "bodyTextLen": 343,
-      "bodyTextHash": "728338d96e173d7318e231897ce740873387b9a21aa27ebc457f9b90a9058f65",
-      "bodyTextPrefix": "RAPIDEZ Pasajero Conductor CARORA · LARA ¿Dónde te buscamos? Mue",
+      "bodyTextLen": 162,
+      "bodyTextHash": "7c6248930afcfdc6429fde288004afdc0713e83e333a87dadfba1d69e73c2d14",
+      "bodyTextPrefix": "RAPIDEZ RAPIDEZ Crear cuenta Una cuenta, un teléfono. Pasajero o",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
@@ -33,6 +33,9 @@
   "brandWarnings": [],
   "authWarnings": [],
   "verdictFile": "/workspace/screenshots/app-builder-built.json",
-  "divergesFromBaseline": false,
-  "baselineReasons": []
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text changed (85 -> 220 chars, hash mismatch)",
+    "mobile: body text changed (188 -> 162 chars, hash mismatch)"
+  ]
 }

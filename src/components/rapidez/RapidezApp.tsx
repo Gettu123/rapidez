@@ -22,7 +22,7 @@ import {
   haversine,
   vesOf,
 } from "@/lib/rapidez/geo";
-import { useRapidez, type PayMethod, type Role } from "@/lib/rapidez/store";
+import { useRapidez, actingDriver, roster, type PayMethod, type Role } from "@/lib/rapidez/store";
 
 const METHODS: { id: PayMethod; title: string; detail: string }[] = [
   { id: "CASH_USD", title: "Efectivo USD", detail: "Billetes en dólares" },
@@ -340,20 +340,15 @@ function ConfirmStep() {
 
 function SearchingStep() {
   const pickup = useRapidez((s) => s.pickup);
-  const online = useRapidez((s) => s.online);
   const cancelTrip = useRapidez((s) => s.cancelTrip);
-  const nearby = pickup ? listNearby(pickup, online).length : 0;
+  const nearby = pickup ? listNearby(pickup).length : 0;
   return (
     <div className="flex flex-col gap-3">
       <h1 className="font-display text-3xl font-extrabold">Buscando moto</h1>
       <p className="text-sm text-muted">
-        {nearby > 0
-          ? `${nearby} ${nearby === 1 ? "moto" : "motos"} en un radio de 3,2 km.`
-          : "Nadie en 3,2 km. Ampliamos al conductor más cercano."}
+        {nearby} mototaxistas catastrados en 3,2 km. Nadie toma la carrera solo.
       </p>
-      <p className="text-sm text-muted">
-        Si el modo conductor está en línea, tienes 15 segundos para aceptar la carrera.
-      </p>
+      <p className="text-sm">Entra como conductor, ponte en línea y acepta. El sello catastrado tiene que estar visible.</p>
       <Button variant="quiet" full onClick={cancelTrip}>
         Cancelar
       </Button>
@@ -382,7 +377,7 @@ function TrackStep() {
     phase === "arrived" ? "Tu moto llegó" : phase === "riding" ? "En camino" : "La moto viene hacia ti";
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs font-semibold tracking-wide text-muted uppercase">Recorrido acelerado</p>
+      <p className="text-xs font-semibold tracking-wide text-muted uppercase">En vivo</p>
       <h1 className="font-display text-3xl font-extrabold">{title}</h1>
       {assigned && (
         <div className="flex items-center justify-between gap-3">
@@ -391,6 +386,7 @@ function TrackStep() {
             <p className="text-sm text-muted">
               {assigned.model} · {assigned.rating.toFixed(2)}
             </p>
+            <Seal elite={assigned.elite} />
           </div>
           <Plate plate={assigned.plate} />
         </div>
@@ -551,7 +547,8 @@ function CopyRow({
 function DriverSheet() {
   const phase = useRapidez((s) => s.phase);
   const assigned = useRapidez((s) => s.assigned);
-  const mine = assigned?.id === "you";
+  const actingId = useRapidez((s) => s.actingId);
+  const mine = assigned?.id === actingId;
   if (phase === "done") return <DoneStep />;
   if (mine && phase === "enroute") return <DriverLeg kind="pickup" />;
   if (mine && phase === "arrived") return <DriverArrived />;
@@ -574,17 +571,23 @@ function DriverHome() {
   const phase = useRapidez((s) => s.phase);
   const payout = useRapidez((s) => s.payout);
   const setPayout = useRapidez((s) => s.setPayout);
+  const actingId = useRapidez((s) => s.actingId);
+  const setActing = useRapidez((s) => s.setActing);
+  const me = actingDriver(actingId, payout);
+  const fleet = roster(payout);
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs font-semibold tracking-wide text-muted uppercase">Conductor · Carora</p>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-extrabold">{online ? "En línea" : "Desconectado"}</h1>
+          <h1 className="font-display text-3xl font-extrabold">{me.name}</h1>
           <p className="text-sm text-muted">
-            {phase === "searching" && !online
-              ? "Hay una solicitud. Entra en línea para recibirla."
-              : "El GPS de fondo se simula: la moto sigue la ruta aunque cambies de vista."}
+            {me.plate} · {me.model}
           </p>
+          <Seal elite={me.elite} />
+          {me.elite && (
+            <p className="mt-1 text-sm">Acabas de entrar a la élite. El sello catastrado ya está activo.</p>
+          )}
         </div>
         <button
           type="button"
@@ -597,8 +600,8 @@ function DriverHome() {
           }}
           className={
             online
-              ? "relative h-8 w-14 shrink-0 rounded-full bg-brand"
-              : "relative h-8 w-14 shrink-0 rounded-full bg-line"
+              ? "relative mt-1 h-8 w-14 shrink-0 rounded-full bg-brand"
+              : "relative mt-1 h-8 w-14 shrink-0 rounded-full bg-line"
           }
         >
           <span
@@ -610,42 +613,75 @@ function DriverHome() {
           />
         </button>
       </div>
-      <p className="text-sm font-semibold">Datos de Pago Móvil</p>
-      <label className="text-sm text-muted" htmlFor="bank">
-        Banco
-      </label>
-      <select
-        id="bank"
-        className="field"
-        value={payout.bank}
-        onChange={(e) => setPayout({ bank: e.target.value })}
-      >
-        {BANKS.map((bank) => (
-          <option key={bank.code} value={bank.code}>
-            {bank.code} · {bank.name}
-          </option>
+      <p className="text-sm text-muted">
+        {online ? "En línea. Si hay solicitud, suena 15 segundos." : "Desconectado. Entra en línea para recibir carreras."}
+        {phase === "searching" && !online ? " Hay una solicitud esperando." : ""}
+      </p>
+      <p className="text-sm font-semibold">Probar con otro mototaxista catastrado</p>
+      <div className="flex flex-wrap gap-2">
+        {fleet.map((driver) => (
+          <button
+            key={driver.id}
+            type="button"
+            onClick={() => setActing(driver.id)}
+            className={
+              driver.id === actingId
+                ? "rounded-full bg-ink px-3 py-2 text-sm font-semibold text-paper"
+                : "rounded-full bg-paper px-3 py-2 text-sm font-semibold text-ink"
+            }
+          >
+            {driver.id === "you" ? "Tú · élite" : driver.name.split(" ")[0]}
+          </button>
         ))}
-      </select>
-      <label className="text-sm text-muted" htmlFor="phone">
-        Teléfono
-      </label>
-      <input
-        id="phone"
-        className="field"
-        inputMode="numeric"
-        value={payout.phone}
-        onChange={(e) => setPayout({ phone: e.target.value.replace(/[^\d]/g, "").slice(0, 11) })}
-      />
-      <label className="text-sm text-muted" htmlFor="cedula">
-        Cédula
-      </label>
-      <input
-        id="cedula"
-        className="field"
-        value={payout.cedula}
-        onChange={(e) => setPayout({ cedula: e.target.value.slice(0, 16) })}
-      />
+      </div>
+      {actingId === "you" && (
+        <>
+          <p className="text-sm font-semibold">Datos de Pago Móvil</p>
+          <label className="text-sm text-muted" htmlFor="bank">
+            Banco
+          </label>
+          <select
+            id="bank"
+            className="field"
+            value={payout.bank}
+            onChange={(e) => setPayout({ bank: e.target.value })}
+          >
+            {BANKS.map((bank) => (
+              <option key={bank.code} value={bank.code}>
+                {bank.code} · {bank.name}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm text-muted" htmlFor="phone">
+            Teléfono
+          </label>
+          <input
+            id="phone"
+            className="field"
+            inputMode="numeric"
+            value={payout.phone}
+            onChange={(e) => setPayout({ phone: e.target.value.replace(/[^\d]/g, "").slice(0, 11) })}
+          />
+          <label className="text-sm text-muted" htmlFor="cedula">
+            Cédula
+          </label>
+          <input
+            id="cedula"
+            className="field"
+            value={payout.cedula}
+            onChange={(e) => setPayout({ cedula: e.target.value.slice(0, 16) })}
+          />
+        </>
+      )}
     </div>
+  );
+}
+
+function Seal({ elite }: { elite: boolean }) {
+  return (
+    <p className="mt-1 text-sm font-extrabold tracking-wide text-ink uppercase">
+      Sello catastrado{elite ? " · Élite" : ""}
+    </p>
   );
 }
 
@@ -768,7 +804,7 @@ function OfferHint() {
       onClick={() => setRole("driver")}
       className="absolute top-16 right-3 left-3 z-20 rounded-2xl bg-brand px-3 py-3 text-left text-ink shadow-lg"
     >
-      <span className="block text-sm font-extrabold">Solicitud sonando en Conductor</span>
+      <span className="block text-sm font-extrabold">Conductor catastrado en línea</span>
       <span className="text-sm">{deadline ? <Countdown deadline={deadline} /> : "15 s"} para aceptar</span>
     </button>
   );
@@ -789,7 +825,7 @@ function OfferDialog() {
       <div className="sheet-in w-full rounded-3xl bg-sheet p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nueva carrera</p>
+            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nueva carrera · sello catastrado</p>
             <h2 id="offer-title" className="font-display text-3xl font-extrabold">
               {deadline ? <Countdown deadline={deadline} /> : "15"}
             </h2>

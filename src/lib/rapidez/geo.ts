@@ -4,7 +4,9 @@ export interface LatLng {
 }
 
 export const RATE_VES = 46.85;
-export const SEARCH_RADIUS_M = 3200;
+export const SEARCH_RADIUS_M = 2500;
+export const OFFER_MS = 18000;
+export const COMMISSION = 0.1;
 export const PROXIMITY_M = 100;
 export const ARRIVE_M = 48;
 

@@ -1,0 +1,1 @@
+import{r as e}from"./index-D4GC59N6.js";import{t}from"./AuthPanel-CVTJ1P8g.js";var n=e();function r(){return(0,n.jsx)(`main`,{className:`grid min-h-dvh place-items-center bg-ink p-6`,children:(0,n.jsx)(t,{})})}export{r as component};

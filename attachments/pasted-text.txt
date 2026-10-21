@@ -1,0 +1,56 @@
+# Guía de Implementación: Lógica Inteligente para App de Moto-Taxi en Carora
+
+## 1. Experiencia de Usuario (UX) y Pantalla Inicial
+Para una ciudad pequeña como Carora, la interfaz de inicio debe ser minimalista y directa para evitar fricciones.
+* **Elementos en Pantalla:**
+  * Un mapa limpio enfocado en la ubicación actual del usuario.
+  * Un campo único y rápido de **"¿A dónde vamos?"** (ej. seleccionar puntos conocidos como *Calicanto* o *La Osa*).
+  * Estimación visual inmediata del costo del viaje antes de confirmar.
+* **Forma de Pago:**
+  * Al ser un mercado con alta dependencia del efectivo, el sistema debe permitir **Pago en Efectivo directo al motorista**.
+  * Opcionalmente, puedes dejar preparada una opción de pago móvil nacional o transferencia, pero el efectivo debe ser la opción principal por defecto.
+
+---
+
+## 2. El Algoritmo de Asignación Inteligente (Basado en Proximidad)
+Como estás empezando con un grupo reducido de conductores, el algoritmo no necesita ser pesado ni predictivo al inicio; debe ser **funcional y basado en geolocalización directa**:
+* **Radio de Cobertura Inicial:** Configura el radio de búsqueda inicial de motoristas cercanos utilizando un tiempo estimado de respuesta de **hasta 5 minutos** (por ejemplo, cubrir trayectos de Calicanto a la urbanización La Osa).
+* **Jerarquía de Envío de Alertas:**
+  1. El sistema detecta la solicitud del pasajero.
+  2. Busca los motoristas **conectados y activos** en un radio determinado (ej. 2 km a la redonda).
+  3. Envía la alerta de viaje **al motorista más cercano primero**.
+  4. Si el motorista no acepta en un tiempo límite (ej. 15 a 20 segundos), el sistema pasa automáticamente al siguiente conductor disponible más cercano.
+
+---
+
+## 3. Sistema de Calificaciones y Reputación (Evaluación Mutua)
+Para que la app aprenda y mantenga altos estándares, implementa una calificación bidireccional al finalizar cada carrera:
+* **Pasajero califica al Motorista:** Evalúa aspectos como conducción segura, amabilidad y uso del casco adicional para el pasajero.
+* **Motorista califica al Pasajero:** Evalúa puntualidad y respeto.
+* **Efecto en el Algoritmo:** Los motoristas y pasajeros con mejores puntuaciones (ej. mayores a 4.5 estrellas) ganan prioridad en las asignaciones futuras, filtrando perfiles problemáticos automáticamente.
+
+---
+
+## 4. Historial de Carreras y Control de Comisiones
+Para llevar el control operativo y de negocio como dueño de la aplicación:
+* **Registro Automático:** Cada vez que una carrera se marca como "Finalizada", una base de datos centralizada almacena el ID del motorista, ID del pasajero, distancia, ruta y monto cobrado.
+* **Modelo de Negocio (Comisiones):** Al tratarse principalmente de pagos en efectivo, el motorista acumula un saldo de comisión pendiente con la plataforma. Puedes implementar un sistema donde:
+  * El motorista debe recargar un saldo prepago en la app para seguir recibiendo carreras.
+  * O la aplicación calcula un porcentaje semanal de cobro que el motorista debe pagar de forma manual al administrador para mantener su cuenta activa.
+
+---
+
+## 5. Medidas Clave de Seguridad (Confianza Inicial)
+Crear confianza en una plataforma nueva requiere barreras de seguridad estrictas desde el día uno:
+* **Verificación de Identidad:** Exigir foto de perfil real y documento de identidad escaneado tanto para registrarse como motorista como para pasajero.
+* **Botón de Pánico / Emergencia:** Un acceso rápido en la pantalla de viaje activo que alerte a soporte o números de emergencia locales.
+* **Compartir Viaje:** Permitir que el pasajero comparta un enlace de seguimiento en tiempo real con un familiar o amigo.
+
+---
+
+## 6. Protección de Datos y Buenas Prácticas al Programar (Seguridad de la API Key)
+Para evitar que tus credenciales o claves de mapas (como Google Maps API o backend) queden expuestas públicamente al subir código a repositorios como GitHub, aplica esta estructura técnica:
+
+1. **Uso de Archivos Locales:** No escribas las llaves directamente en el código fuente. Guárdalas en un archivo protegido llamado `local.properties` en la raíz de tu proyecto en Android Studio:
+   ```properties
+   MAPS_API_KEY=tu_clave_secreta_aqui

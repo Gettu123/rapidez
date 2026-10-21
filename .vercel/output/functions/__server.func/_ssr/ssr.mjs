@@ -1,17 +1,33 @@
-import { n as __exportAll } from "../_runtime.mjs";
-import { n as require_react } from "../_libs/@radix-ui/react-compose-refs+[...].mjs";
-import { D as toCrossJSONAsync, F as waitForReason, G as rootRouteId, H as isPromise, I as _getRenderedMatches, K as isNotFound, L as executeRewriteInput, M as getStylesheetHref, N as resolveManifestAssetLink, O as toCrossJSONStream, P as resolveManifestCssLink, R as invariant, T as fromJSON, V as isDangerousProtocol, W as isRedirect, a as isSsrResponse, c as stripSsrResponseBody, i as disposeSsrResponse, j as getScriptPreloadAttrs, m as RouterProvider, n as bindSsrResponseToRequest, o as normalizeSsrResponse, r as defineHandlerCallback, s as replaceSsrResponse, t as renderRouterToStream, x as require_jsx_runtime } from "../_libs/@tanstack/react-router+[...].mjs";
+import { r as __exportAll$1 } from "../_runtime.mjs";
+import { D as toCrossJSONAsync, F as waitForReason, G as parseRedirect, H as isPromise, I as _getRenderedMatches, J as require_react, K as rootRouteId, L as executeRewriteInput, M as getStylesheetHref, N as resolveManifestAssetLink, O as toCrossJSONStream, P as resolveManifestCssLink, R as invariant, T as fromJSON, V as isDangerousProtocol, W as isRedirect, a as disposeSsrResponse, c as replaceSsrResponse, i as defineHandlerCallback, j as getScriptPreloadAttrs, l as stripSsrResponseBody, m as RouterProvider, o as isSsrResponse, q as isNotFound, r as bindSsrResponseToRequest, s as normalizeSsrResponse, t as renderRouterToStream, x as require_jsx_runtime } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as createServerHistory } from "../_libs/tanstack__history.mjs";
 import { a as defaultSerovalDeserializerPlugins, i as createRawStreamRPCPlugin, n as attachRouterServerSsrUtils, o as makeSerovalPlugin, r as getNormalizedURL, s as createSerializationAdapter, t as mergeHeaders } from "../_libs/@tanstack/router-core+[...].mjs";
-import { n as toResponse, t as H3Event } from "../_libs/h3-v2+rou3.mjs";
+import { n as setCookie, r as toResponse, t as H3Event } from "../_libs/h3-v2+rou3.mjs";
 import { AsyncLocalStorage } from "node:async_hooks";
 //#region node_modules/.nitro/vite/services/ssr/index.js
-var ssr_exports = /* @__PURE__ */ __exportAll({
+var ssr_exports = /* @__PURE__ */ __exportAll$1({
+	a: () => getServerFnById,
 	createServerEntry: () => createServerEntry,
-	default: () => server_default
+	default: () => server_default,
+	i: () => TSS_SERVER_FUNCTION,
+	n: () => createMiddleware,
+	o: () => getRequest,
+	r: () => createServerFn,
+	s: () => __exportAll,
+	t: () => server_exports
 });
 require_react();
 var import_jsx_runtime = require_jsx_runtime();
+var __defProp = Object.defineProperty;
+var __exportAll = (all, no_symbols) => {
+	let target = {};
+	for (var name in all) __defProp(target, name, {
+		get: all[name],
+		enumerable: true
+	});
+	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+	return target;
+};
 function StartServer(props) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RouterProvider, { router: props.router });
 }
@@ -26,7 +42,7 @@ var globalObj$1 = globalThis;
 if (!globalObj$1[GLOBAL_EVENT_STORAGE_KEY]) globalObj$1[GLOBAL_EVENT_STORAGE_KEY] = new AsyncLocalStorage();
 var eventStorage = globalObj$1[GLOBAL_EVENT_STORAGE_KEY];
 function isPromiseLike(value) {
-	return typeof value.then === "function";
+	return (typeof value === "object" || typeof value === "function") && value !== null && typeof value.then === "function";
 }
 function getSetCookieValues(headers) {
 	const headersWithSetCookie = headers;
@@ -43,13 +59,23 @@ function mergeEventResponseHeaders(response, event) {
 	for (const cookie of responseSetCookies) response.headers.append("set-cookie", cookie);
 	for (const cookie of eventSetCookies) response.headers.append("set-cookie", cookie);
 }
-function attachResponseHeaders(value, event) {
-	if (isPromiseLike(value)) return value.then((resolved) => {
-		if (resolved instanceof Response) mergeEventResponseHeaders(resolved, event);
-		return resolved;
-	});
-	if (value instanceof Response) mergeEventResponseHeaders(value, event);
-	return value;
+function finalizeResponse(value, event) {
+	const response = ensureResponse(value);
+	mergeEventResponseHeaders(response, event);
+	return response;
+}
+function finalizeMaybeResponse(value, event) {
+	if (isPromiseLike(value)) return Promise.resolve(value).then((resolved) => finalizeResponse(resolved, event), (error) => finalizeResponse(handleResponseError(error), event));
+	return finalizeResponse(value, event);
+}
+function ensureResponse(value) {
+	if (value instanceof Response) return value;
+	return new Response("Internal Server Error", { status: 500 });
+}
+function handleResponseError(error) {
+	if (error instanceof Response) return error;
+	if (error instanceof Error) throw error;
+	return new Response("Internal Server Error", { status: 500 });
 }
 function requestHandler(handler) {
 	return (request, requestOpts) => {
@@ -63,13 +89,35 @@ function requestHandler(handler) {
 			});
 			throw error;
 		}
-		return toResponse(attachResponseHeaders(eventStorage.run({ h3Event }, () => handler(request, requestOpts)), h3Event), h3Event);
+		let response;
+		try {
+			response = eventStorage.run({ h3Event }, () => handler(request, requestOpts));
+		} catch (error) {
+			response = handleResponseError(error);
+		}
+		return toResponse(finalizeMaybeResponse(response, h3Event), h3Event);
 	};
 }
 function getH3Event() {
 	const event = eventStorage.getStore();
 	if (!event) throw new Error(`No StartEvent found in AsyncLocalStorage. Make sure you are using the function within the server runtime.`);
 	return event.h3Event;
+}
+function getRequest() {
+	return getH3Event().req;
+}
+/**
+* Set a cookie value by name.
+* @param name Name of the cookie to set
+* @param value Value of the cookie to set
+* @param options {CookieSerializeOptions} Options for serializing the cookie
+* ```ts
+* setCookie('Authorization', '1234567')
+* ```
+*/
+function setCookie$1(name, value, options) {
+	const event = getH3Event();
+	setCookie(event, name, value, options);
 }
 function getResponse() {
 	return getH3Event().res;
@@ -85,7 +133,7 @@ var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-B5TUlRDe.mjs");
+	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-DTqUw5vJ.mjs");
 	const startManifest = tsrStartManifest();
 	let routes = startManifest.routes;
 	routes[rootRouteId];
@@ -104,7 +152,36 @@ async function getStartManifest(matchedRoutes) {
 		routes: manifestRoutes
 	};
 }
-var manifest = {};
+var manifest = {
+	"327c2b15651ac192c904a6fb119d7db2bb7a4027b2de920e10320782fa8d6df1": {
+		functionName: "reviewDecide_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"795d2dfd88be129cbc21363762908a6d2522ce6e140aeea7d395dad416a09288": {
+		functionName: "submitProfile_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"84038b8fe5e09ebe23acf7a4f3d08c8a6edc71bede65677cd31190bbf5b0965d": {
+		functionName: "acceptTrip_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"9e06b043a53f2f14fff17ba04319d6e689c366aa06bbaab435b300b61c7dcd74": {
+		functionName: "setTripStatus_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"9f92a4d03eaad67fcfe0608bdf4fd72c9e035b9e1a5eedde5ef6b631a0e18b06": {
+		functionName: "syncLive_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"cbb75616bdaa9a4a21b5c2958c01c9affc0541a677013764d70e2e07355b88df": {
+		functionName: "reviewList_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	},
+	"e51757db75e422e949ee0e31bd83b1b3ffb42649453b2087e31c0f5cf885387c": {
+		functionName: "requestTrip_createServerFn_handler",
+		importer: () => import("./live-api-BBGh3cnv.mjs")
+	}
+};
 async function getServerFnById(id, access) {
 	const serverFnInfo = manifest[id];
 	if (!serverFnInfo) throw new Error("Server function info not found for " + id);
@@ -116,6 +193,7 @@ async function getServerFnById(id, access) {
 }
 var TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";
 var TSS_SERVER_FUNCTION = Symbol.for("TSS_SERVER_FUNCTION");
+var TSS_SERVER_FUNCTION_FACTORY = Symbol.for("TSS_SERVER_FUNCTION_FACTORY");
 var X_TSS_SERIALIZED = "x-tss-serialized";
 var X_TSS_RAW_RESPONSE = "x-tss-raw";
 /** Content-Type for multiplexed framed responses (RawStream support) */
@@ -280,7 +358,8 @@ function createMultiplexedStream(recordStream, options = {}) {
 				if (!(value instanceof Uint8Array)) throw new TypeError("RawStream chunks must be Uint8Array");
 				let offset = 0;
 				do {
-					const frameAdmission = admitFrame(1, streamId, value.byteLength <= 16777216 ? value : value.subarray(offset, offset + MAX_FRAME_PAYLOAD_SIZE));
+					const chunk = value.byteLength <= 16777216 ? value : value.subarray(offset, offset + MAX_FRAME_PAYLOAD_SIZE);
+					const frameAdmission = admitFrame(1, streamId, chunk);
 					if (frameAdmission !== true && (frameAdmission === false || !await frameAdmission)) return;
 					offset += MAX_FRAME_PAYLOAD_SIZE;
 				} while (offset < value.byteLength);
@@ -365,6 +444,154 @@ function createNullProtoObject(source) {
 	for (const key of Object.keys(source)) if (isSafeKey(key)) obj[key] = source[key];
 	return obj;
 }
+var getStartContextServerOnly = getStartContext;
+var createServerFn = (options, __opts) => {
+	const resolvedOptions = __opts || options || {};
+	if (typeof resolvedOptions.method === "undefined") resolvedOptions.method = "GET";
+	const setValidator = (validator) => {
+		return createServerFn(void 0, {
+			...resolvedOptions,
+			validator,
+			inputValidator: validator
+		});
+	};
+	const res = {
+		options: resolvedOptions,
+		middleware: (middleware) => {
+			const newMiddleware = [...resolvedOptions.middleware || []];
+			middleware.forEach((item) => {
+				if (TSS_SERVER_FUNCTION_FACTORY in item) {
+					if (item.options.middleware) newMiddleware.push(...item.options.middleware);
+				} else newMiddleware.push(item);
+			});
+			const res = createServerFn(void 0, {
+				...resolvedOptions,
+				middleware: newMiddleware
+			});
+			res[TSS_SERVER_FUNCTION_FACTORY] = true;
+			return res;
+		},
+		validator: setValidator,
+		inputValidator: setValidator,
+		handler: (...args) => {
+			const [extractedFn, serverFn] = args;
+			const newOptions = {
+				...resolvedOptions,
+				extractedFn,
+				serverFn
+			};
+			const resolvedMiddleware = [...newOptions.middleware || [], serverFnBaseToMiddleware(newOptions)];
+			extractedFn.method = resolvedOptions.method;
+			return Object.assign(async (opts) => {
+				const result = await executeMiddleware$1(resolvedMiddleware, "client", {
+					...extractedFn,
+					...newOptions,
+					data: opts?.data,
+					headers: opts?.headers,
+					signal: opts?.signal,
+					fetch: opts?.fetch,
+					context: createNullProtoObject()
+				});
+				const redirect = parseRedirect(result.error);
+				if (redirect) throw redirect;
+				if (result.error) throw result.error;
+				return result.result;
+			}, {
+				...extractedFn,
+				method: resolvedOptions.method,
+				__executeServer: async (opts) => {
+					const startContext = getStartContextServerOnly();
+					const serverContextAfterGlobalMiddlewares = startContext.contextAfterGlobalMiddlewares;
+					const ctx = {
+						...extractedFn,
+						data: opts.data,
+						method: opts.method ?? resolvedOptions.method,
+						serverFnMeta: extractedFn.serverFnMeta,
+						context: safeObjectMerge(opts.context, serverContextAfterGlobalMiddlewares),
+						request: startContext.request
+					};
+					return await executeMiddleware$1(resolvedMiddleware, "server", ctx).then((d) => ({
+						result: d.result,
+						error: d.error,
+						context: d.sendContext
+					}));
+				}
+			});
+		}
+	};
+	const fun = (options) => {
+		return createServerFn(void 0, {
+			...resolvedOptions,
+			...options
+		});
+	};
+	return Object.assign(fun, res);
+};
+async function executeMiddleware$1(middlewares, env, opts) {
+	let flattenedMiddlewares = flattenMiddlewares([...getStartOptions()?.functionMiddleware || [], ...middlewares]);
+	if (env === "server") {
+		const startContext = getStartContextServerOnly({ throwIfNotFound: false });
+		if (startContext?.executedRequestMiddlewares) flattenedMiddlewares = flattenedMiddlewares.filter((m) => !startContext.executedRequestMiddlewares.has(m));
+	}
+	const callNextMiddleware = async (ctx) => {
+		const nextMiddleware = flattenedMiddlewares.shift();
+		if (!nextMiddleware) return ctx;
+		try {
+			let validator = "validator" in nextMiddleware.options ? nextMiddleware.options.validator : void 0;
+			if (!validator && "inputValidator" in nextMiddleware.options) validator = nextMiddleware.options.inputValidator;
+			if (validator && env === "server") ctx.data = await execValidator(validator, ctx.data);
+			let middlewareFn = void 0;
+			if (env === "client") {
+				if ("client" in nextMiddleware.options) middlewareFn = nextMiddleware.options.client;
+			} else if ("server" in nextMiddleware.options) middlewareFn = nextMiddleware.options.server;
+			if (middlewareFn) {
+				const userNext = async (userCtx = {}) => {
+					const nextCtx = {
+						...ctx,
+						...userCtx,
+						context: safeObjectMerge(ctx.context, userCtx.context),
+						sendContext: safeObjectMerge(ctx.sendContext, userCtx.sendContext),
+						headers: mergeHeaders(ctx.headers, userCtx.headers),
+						_callSiteFetch: ctx._callSiteFetch,
+						fetch: ctx._callSiteFetch ?? userCtx.fetch ?? ctx.fetch,
+						result: userCtx.result !== void 0 ? userCtx.result : userCtx instanceof Response ? userCtx : ctx.result,
+						error: userCtx.error ?? ctx.error
+					};
+					const result = await callNextMiddleware(nextCtx);
+					if (result.error) throw result.error;
+					return result;
+				};
+				const result = await middlewareFn({
+					...ctx,
+					next: userNext
+				});
+				if (isRedirect(result)) return {
+					...ctx,
+					error: result
+				};
+				if (result instanceof Response) return {
+					...ctx,
+					result
+				};
+				if (!result) throw new Error("User middleware returned undefined. You must call next() or return a result in your middlewares.");
+				return result;
+			}
+			return callNextMiddleware(ctx);
+		} catch (error) {
+			return {
+				...ctx,
+				error
+			};
+		}
+	};
+	return callNextMiddleware({
+		...opts,
+		headers: opts.headers || {},
+		sendContext: opts.sendContext || {},
+		context: opts.context || createNullProtoObject(),
+		_callSiteFetch: opts.fetch
+	});
+}
 function flattenMiddlewares(middlewares, maxDepth = 100) {
 	const seen = /* @__PURE__ */ new Set();
 	const flattened = [];
@@ -380,6 +607,40 @@ function flattenMiddlewares(middlewares, maxDepth = 100) {
 	};
 	recurse(middlewares, 0);
 	return flattened;
+}
+async function execValidator(validator, input) {
+	if (validator == null) return {};
+	if ("~standard" in validator) {
+		const result = await validator["~standard"].validate(input);
+		if (result.issues) throw new Error(JSON.stringify(result.issues, void 0, 2));
+		return result.value;
+	}
+	if ("parse" in validator) return validator.parse(input);
+	if (typeof validator === "function") return validator(input);
+	throw new Error("Invalid validator type!");
+}
+function serverFnBaseToMiddleware(options) {
+	return {
+		"~types": void 0,
+		options: {
+			inputValidator: options.validator ?? options.inputValidator,
+			client: async ({ next, sendContext, fetch, ...ctx }) => {
+				const payload = {
+					...ctx,
+					context: sendContext,
+					fetch
+				};
+				return next(await options.extractedFn?.(payload));
+			},
+			server: async ({ next, ...ctx }) => {
+				const result = await options.serverFn?.(ctx);
+				return next({
+					...ctx,
+					result
+				});
+			}
+		}
+	};
 }
 var createMiddleware = (options, __opts) => {
 	const resolvedOptions = {
@@ -504,26 +765,31 @@ var handleServerAction = async ({ request, context, serverFnId }) => {
 				method: methodUpper
 			};
 			if (typeof serializedContext === "string") try {
-				const deserializedContext = fromJSON(JSON.parse(serializedContext), { plugins: serovalPlugins });
+				const parsedContext = JSON.parse(serializedContext);
+				const deserializedContext = fromJSON(parsedContext, { plugins: serovalPlugins });
 				if (typeof deserializedContext === "object" && deserializedContext) params.context = safeObjectMerge(deserializedContext, context);
 			} catch (e) {}
 			res = await action(params);
 		} else if (methodUpper === "GET") {
 			const payloadParam = url.searchParams.get("payload");
 			if (payloadParam && payloadParam.length > MAX_PAYLOAD_SIZE) throw new Error("Payload too large");
-			const payload = payloadParam ? fromJSON(JSON.parse(payloadParam), { plugins: serovalPlugins }) : {};
-			payload.context = safeObjectMerge(payload.context, context);
-			payload.method = methodUpper;
-			res = await action(payload);
+			const payload = payloadParam ? fromJSON(JSON.parse(payloadParam), { plugins: serovalPlugins }) : void 0;
+			res = await action({
+				data: payload?.data,
+				context: safeObjectMerge(payload?.context, context),
+				method: methodUpper
+			});
 		} else {
-			const payload = contentType?.includes("application/json") ? fromJSON(await request.json(), { plugins: serovalPlugins }) : {};
-			payload.context = safeObjectMerge(payload.context, context);
-			payload.method = methodUpper;
-			res = await action(payload);
+			const payload = contentType?.includes("application/json") ? fromJSON(await request.json(), { plugins: serovalPlugins }) : void 0;
+			res = await action({
+				data: payload?.data,
+				context: safeObjectMerge(payload?.context, context),
+				method: methodUpper
+			});
 		}
-		const unwrapped = res.result !== void 0 ? res.result : res.error;
+		const unwrapped = res.error !== void 0 ? res.error : res.result;
 		if (isNotFound(res)) res = isNotFoundResponse(res);
-		if (!isServerFn) return unwrapped;
+		if (!isServerFn && (unwrapped instanceof Response || unwrapped === null || typeof unwrapped !== "object")) return unwrapped;
 		if (unwrapped instanceof Response) {
 			if (isRedirect(unwrapped)) return unwrapped;
 			unwrapped.headers.set(X_TSS_RAW_RESPONSE, "true");
@@ -747,13 +1013,12 @@ function serializeResult(res, signal, plugins) {
 }
 function isNotFoundResponse(error) {
 	const { headers, ...rest } = error;
-	return new Response(JSON.stringify(rest), {
+	const response = new Response(JSON.stringify(rest), {
 		status: 404,
-		headers: {
-			"Content-Type": "application/json",
-			...headers || {}
-		}
+		headers
 	});
+	response.headers.set("Content-Type", "application/json");
+	return response;
 }
 var LINK_PARAM_TOKEN_RE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
 var PRELOAD_AS_VALUES = /* @__PURE__ */ new Set([
@@ -1117,7 +1382,8 @@ async function transformManifestAssets(source, transformFn, _opts) {
 	else if (manifest.inlineCss) manifest.inlineCss = await transformInlineCssStyles(manifest.inlineCss, transformFn);
 	for (const route of Object.values(manifest.routes)) {
 		if (route.preloads?.length) route.preloads = await Promise.all(route.preloads.map(async (link) => {
-			const result = await transformScript(resolveManifestAssetLink(link).href);
+			const resolved = resolveManifestAssetLink(link);
+			const result = await transformScript(resolved.href);
 			return assignManifestLink(link, {
 				href: result.href,
 				crossOrigin: result.crossOrigin
@@ -1298,7 +1564,14 @@ var ServerFunctionSerializationAdapter = createSerializationAdapter({
 	toSerializable: ({ serverFnMeta }) => ({ functionId: serverFnMeta.id }),
 	fromSerializable: ({ functionId }) => {
 		const fn = async (opts, signal) => {
-			return (await (await getServerFnById(functionId, { origin: "client" }))(opts ?? {}, signal)).result;
+			const serverFn = await getServerFnById(functionId, { origin: "client" });
+			const result = await serverFn({
+				data: opts?.data,
+				context: opts?.context,
+				method: serverFn.method ?? "GET"
+			}, signal);
+			if (result.error !== void 0) throw result.error;
+			return result.result;
 		};
 		return fn;
 	}
@@ -1316,7 +1589,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-Dld0M_Dj.mjs").then((n) => n.t),
+		import("./router-B87uhmrw.mjs").then((n) => n.t),
 		import("./start-5Z2QO8AU.mjs"),
 		import("./empty-plugin-adapters-D9UWiqvJ.mjs")
 	]);
@@ -1636,11 +1909,12 @@ function createStartHandler(cbOrOptions) {
 					earlyHints?.appendResponseHeaders(responseHeaders);
 					signal.throwIfAborted();
 					const disposeLate = createLateResponseDisposer(signal);
-					return normalizeSsrResponse(await waitForReason(cb({
+					const response = await waitForReason(cb({
 						request,
 						router: routerInstance,
 						responseHeaders
-					}), signal, disposeLate, disposeLate));
+					}), signal, disposeLate, disposeLate);
+					return normalizeSsrResponse(response);
 				};
 				terminal = ({ context }) => runWithStartContext({
 					...startContext,
@@ -1713,6 +1987,20 @@ async function handleRedirectResponse(response, getRouter, signal, serializeRedi
 	}
 	return ssrResponse;
 }
+function withParsedParams(handler, matchedRoutes) {
+	if (!matchedRoutes.some((route) => route.options.params?.parse ?? route.options.parseParams)) return handler;
+	return (ctx) => {
+		const params = Object.assign(Object.create(null), ctx.params);
+		for (const route of matchedRoutes) {
+			const parse = route.options.params?.parse ?? route.options.parseParams;
+			if (parse) Object.assign(params, parse(params));
+		}
+		return handler({
+			...ctx,
+			params
+		});
+	};
+}
 async function handleServerRoutes({ getRouter, request, url, executeRouter, context, executedRequestMiddlewares }) {
 	const router = await getRouter();
 	const pathname = executeRewriteInput(router.rewrite, url).pathname;
@@ -1735,30 +2023,32 @@ async function handleServerRoutes({ getRouter, request, url, executeRouter, cont
 		const handler = requestMethod === "HEAD" ? handlers["HEAD"] ?? handlers["GET"] ?? handlers["ANY"] : handlers[requestMethod] ?? handlers["ANY"];
 		if (handler) {
 			const mayDefer = !!foundRoute.options.component;
-			if (typeof handler === "function") if (!mayDefer) {
-				terminalHandler = handler;
-				terminalNext = throwIfMayNotDefer;
-			} else routeMiddlewares.push(handler);
-			else {
+			if (typeof handler !== "function") {
 				if (handler.middleware?.length) {
 					const handlerMiddlewares = flattenMiddlewares(handler.middleware);
 					for (const m of handlerMiddlewares) routeMiddlewares.push(m.options.server);
 				}
-				if (handler.handler) if (!mayDefer) {
-					terminalHandler = handler.handler;
+			}
+			const routeHandler = typeof handler === "function" ? handler : handler.handler;
+			if (routeHandler) {
+				const parsedHandler = withParsedParams(routeHandler, matchedRoutes);
+				if (!mayDefer) {
+					terminalHandler = parsedHandler;
 					terminalNext = throwIfMayNotDefer;
-				} else routeMiddlewares.push(handler.handler);
+				} else routeMiddlewares.push(parsedHandler);
 			}
 		}
 	}
-	return normalizeSsrResponse(await executeMiddleware(routeMiddlewares, terminalHandler, {
+	const response = await executeMiddleware(routeMiddlewares, terminalHandler, {
 		request,
 		context,
 		params: rawParams,
 		pathname,
 		handlerType: "router"
-	}, request.signal, terminalNext));
+	}, request.signal, terminalNext);
+	return normalizeSsrResponse(response);
 }
+var server_exports = /* @__PURE__ */ __exportAll({ setCookie: () => setCookie$1 });
 var fetch = createStartHandler(defaultStreamHandler);
 function createServerEntry(entry) {
 	return { async fetch(...args) {
@@ -1767,4 +2057,4 @@ function createServerEntry(entry) {
 }
 var server_default = createServerEntry({ fetch });
 //#endregion
-export { createServerEntry, server_default as default, ssr_exports as t };
+export { getServerFnById as a, ssr_exports as c, createServerEntry, server_default as default, TSS_SERVER_FUNCTION as i, createMiddleware as n, getRequest as o, createServerFn as r, __exportAll as s, server_exports as t };

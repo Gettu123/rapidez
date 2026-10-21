@@ -24,6 +24,8 @@ export interface DriverProfile {
   phone: string;
   cedula: string;
   pos: LatLng;
+  registered: true;
+  elite: boolean;
 }
 
 export const BANKS: Bank[] = [
@@ -35,6 +37,20 @@ export const BANKS: Bank[] = [
 ];
 
 export const PLACES: Place[] = [
+  {
+    id: "calicanto",
+    name: "Calicanto",
+    hint: "Iglesia San José",
+    lat: 10.1904812,
+    lng: -70.0723012,
+  },
+  {
+    id: "la-osa",
+    name: "La Osa",
+    hint: "urbanización",
+    lat: 10.1742,
+    lng: -70.0798,
+  },
   {
     id: "catedral",
     name: "Catedral San Juan Bautista",
@@ -100,6 +116,8 @@ export const NPCS: DriverProfile[] = [
     phone: "04145551020",
     cedula: "V-18422109",
     pos: { lat: 10.1782, lng: -70.0848 },
+    registered: true,
+    elite: false,
   },
   {
     id: "maria",
@@ -112,6 +130,8 @@ export const NPCS: DriverProfile[] = [
     phone: "04245559876",
     cedula: "V-20114555",
     pos: { lat: 10.1714, lng: -70.0768 },
+    registered: true,
+    elite: false,
   },
   {
     id: "luis",
@@ -124,6 +144,64 @@ export const NPCS: DriverProfile[] = [
     phone: "04165551200",
     cedula: "V-15900321",
     pos: { lat: 10.1691, lng: -70.0894 },
+    registered: true,
+    elite: false,
+  },
+  {
+    id: "rosa",
+    name: "Rosa Méndez",
+    plate: "MC18RS",
+    model: "Empire Keeway",
+    rating: 4.9,
+    bank: "0108",
+    bankName: "Banco Provincial",
+    phone: "04245550111",
+    cedula: "V-16881200",
+    pos: { lat: 10.1769, lng: -70.0811 },
+    registered: true,
+    elite: false,
+  },
+  {
+    id: "pedro",
+    name: "Pedro Alvarado",
+    plate: "TR07PD",
+    model: "Bera BRZ",
+    rating: 4.81,
+    bank: "0114",
+    bankName: "Banco del Tesoro",
+    phone: "04165550990",
+    cedula: "V-14220018",
+    pos: { lat: 10.1708, lng: -70.0759 },
+    registered: true,
+    elite: false,
+  },
+  {
+    id: "ana",
+    name: "Ana Gil",
+    plate: "GL33AN",
+    model: "Bera SBR",
+    rating: 4.95,
+    bank: "0134",
+    bankName: "Banesco",
+    phone: "04125557890",
+    cedula: "V-22334001",
+    pos: { lat: 10.1742, lng: -70.0866 },
+    registered: true,
+    elite: false,
+  },
+  {
+    id: "hector",
+    name: "Héctor Suárez",
+    plate: "HS02CR",
+    model: "Keeway Arsen",
+    rating: 4.74,
+    bank: "0102",
+    bankName: "Banco de Venezuela",
+    phone: "04265554421",
+    cedula: "V-13009876",
+    pos: { lat: 10.1816, lng: -70.0902 },
+    registered: true,
+    elite: false,
   },
 ];
 
@@ -138,6 +216,8 @@ export const YOU_BASE: DriverProfile = {
   phone: "04125551234",
   cedula: "V-18999888",
   pos: { lat: 10.1831, lng: -70.0824 },
+  registered: true,
+  elite: true,
 };
 
 export function nearestPlace(point: LatLng): { place: Place; meters: number } {

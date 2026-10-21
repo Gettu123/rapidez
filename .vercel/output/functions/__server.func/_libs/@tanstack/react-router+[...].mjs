@@ -1,7 +1,398 @@
-import { i as __toESM, r as __require, t as __commonJSMin } from "../../_runtime.mjs";
-import { n as require_react } from "../@radix-ui/react-compose-refs+[...].mjs";
+import { i as __require, o as __toESM, t as __commonJSMin } from "../../_runtime.mjs";
 import { i as parseHref, r as normalizeProtocolRelative } from "../tanstack__history.mjs";
 import { PassThrough, Readable } from "node:stream";
+//#region node_modules/react/cjs/react.production.js
+/**
+* @license React
+* react.production.js
+*
+* Copyright (c) Meta Platforms, Inc. and affiliates.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+var require_react_production = /* @__PURE__ */ __commonJSMin(((exports) => {
+	var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
+	var REACT_PORTAL_TYPE = Symbol.for("react.portal");
+	var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+	var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
+	var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
+	var REACT_CONSUMER_TYPE = Symbol.for("react.consumer");
+	var REACT_CONTEXT_TYPE = Symbol.for("react.context");
+	var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
+	var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
+	var REACT_MEMO_TYPE = Symbol.for("react.memo");
+	var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+	var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
+	var REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition");
+	var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+	function getIteratorFn(maybeIterable) {
+		if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
+		maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+		return "function" === typeof maybeIterable ? maybeIterable : null;
+	}
+	var ReactNoopUpdateQueue = {
+		isMounted: function() {
+			return !1;
+		},
+		enqueueForceUpdate: function() {},
+		enqueueReplaceState: function() {},
+		enqueueSetState: function() {}
+	};
+	var assign = Object.assign;
+	var emptyObject = {};
+	function Component(props, context, updater) {
+		this.props = props;
+		this.context = context;
+		this.refs = emptyObject;
+		this.updater = updater || ReactNoopUpdateQueue;
+	}
+	Component.prototype.isReactComponent = {};
+	Component.prototype.setState = function(partialState, callback) {
+		if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState) throw Error("takes an object of state variables to update or a function which returns an object of state variables.");
+		this.updater.enqueueSetState(this, partialState, callback, "setState");
+	};
+	Component.prototype.forceUpdate = function(callback) {
+		this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+	};
+	function ComponentDummy() {}
+	ComponentDummy.prototype = Component.prototype;
+	function PureComponent(props, context, updater) {
+		this.props = props;
+		this.context = context;
+		this.refs = emptyObject;
+		this.updater = updater || ReactNoopUpdateQueue;
+	}
+	var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
+	pureComponentPrototype.constructor = PureComponent;
+	assign(pureComponentPrototype, Component.prototype);
+	pureComponentPrototype.isPureReactComponent = !0;
+	var isArrayImpl = Array.isArray;
+	function noop() {}
+	var ReactSharedInternals = {
+		H: null,
+		A: null,
+		T: null,
+		S: null
+	};
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	function ReactElement(type, key, props) {
+		var refProp = props.ref;
+		return {
+			$$typeof: REACT_ELEMENT_TYPE,
+			type,
+			key,
+			ref: void 0 !== refProp ? refProp : null,
+			props
+		};
+	}
+	function cloneAndReplaceKey(oldElement, newKey) {
+		return ReactElement(oldElement.type, newKey, oldElement.props);
+	}
+	function isValidElement(object) {
+		return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+	}
+	function escape(key) {
+		var escaperLookup = {
+			"=": "=0",
+			":": "=2"
+		};
+		return "$" + key.replace(/[=:]/g, function(match) {
+			return escaperLookup[match];
+		});
+	}
+	var userProvidedKeyEscapeRegex = /\/+/g;
+	function getElementKey(element, index) {
+		return "object" === typeof element && null !== element && null != element.key ? escape("" + element.key) : index.toString(36);
+	}
+	function resolveThenable(thenable) {
+		switch (thenable.status) {
+			case "fulfilled": return thenable.value;
+			case "rejected": throw thenable.reason;
+			default: switch ("string" === typeof thenable.status ? thenable.then(noop, noop) : (thenable.status = "pending", thenable.then(function(fulfilledValue) {
+				"pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+			}, function(error) {
+				"pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+			})), thenable.status) {
+				case "fulfilled": return thenable.value;
+				case "rejected": throw thenable.reason;
+			}
+		}
+		throw thenable;
+	}
+	function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+		var type = typeof children;
+		if ("undefined" === type || "boolean" === type) children = null;
+		var invokeCallback = !1;
+		if (null === children) invokeCallback = !0;
+		else switch (type) {
+			case "bigint":
+			case "string":
+			case "number":
+				invokeCallback = !0;
+				break;
+			case "object": switch (children.$$typeof) {
+				case REACT_ELEMENT_TYPE:
+				case REACT_PORTAL_TYPE:
+					invokeCallback = !0;
+					break;
+				case REACT_LAZY_TYPE: return invokeCallback = children._init, mapIntoArray(invokeCallback(children._payload), array, escapedPrefix, nameSoFar, callback);
+			}
+		}
+		if (invokeCallback) return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+			return c;
+		})) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(callback, escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(userProvidedKeyEscapeRegex, "$&/") + "/") + invokeCallback)), array.push(callback)), 1;
+		invokeCallback = 0;
+		var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
+		if (isArrayImpl(children)) for (var i = 0; i < children.length; i++) nameSoFar = children[i], type = nextNamePrefix + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(nameSoFar, array, escapedPrefix, type, callback);
+		else if (i = getIteratorFn(children), "function" === typeof i) for (children = i.call(children), i = 0; !(nameSoFar = children.next()).done;) nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(nameSoFar, array, escapedPrefix, type, callback);
+		else if ("object" === type) {
+			if ("function" === typeof children.then) return mapIntoArray(resolveThenable(children), array, escapedPrefix, nameSoFar, callback);
+			array = String(children);
+			throw Error("Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead.");
+		}
+		return invokeCallback;
+	}
+	function mapChildren(children, func, context) {
+		if (null == children) return children;
+		var result = [], count = 0;
+		mapIntoArray(children, result, "", "", function(child) {
+			return func.call(context, child, count++);
+		});
+		return result;
+	}
+	function lazyInitializer(payload) {
+		if (-1 === payload._status) {
+			var ctor = payload._result, thenable = ctor();
+			thenable.then(function(moduleObject) {
+				if (0 === payload._status || -1 === payload._status) payload._status = 1, payload._result = moduleObject, void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
+			}, function(error) {
+				if (0 === payload._status || -1 === payload._status) payload._status = 2, payload._result = error, void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+			});
+			-1 === payload._status && (payload._status = 0, payload._result = thenable);
+		}
+		if (1 === payload._status) return payload._result.default;
+		throw payload._result;
+	}
+	var reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+		if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+			var event = new window.ErrorEvent("error", {
+				bubbles: !0,
+				cancelable: !0,
+				message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+				error
+			});
+			if (!window.dispatchEvent(event)) return;
+		} else if ("object" === typeof process && "function" === typeof process.emit) {
+			process.emit("uncaughtException", error);
+			return;
+		}
+		console.error(error);
+	};
+	function startTransition(scope) {
+		var prevTransition = ReactSharedInternals.T, currentTransition = {};
+		currentTransition.types = null !== prevTransition ? prevTransition.types : null;
+		ReactSharedInternals.T = currentTransition;
+		try {
+			var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+			null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+			"object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop, reportGlobalError);
+		} catch (error) {
+			reportGlobalError(error);
+		} finally {
+			null !== prevTransition && null !== currentTransition.types && (prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
+		}
+	}
+	function addTransitionType(type) {
+		var transition = ReactSharedInternals.T;
+		if (null !== transition) {
+			var transitionTypes = transition.types;
+			null === transitionTypes ? transition.types = [type] : -1 === transitionTypes.indexOf(type) && transitionTypes.push(type);
+		} else startTransition(addTransitionType.bind(null, type));
+	}
+	var Children = {
+		map: mapChildren,
+		forEach: function(children, forEachFunc, forEachContext) {
+			mapChildren(children, function() {
+				forEachFunc.apply(this, arguments);
+			}, forEachContext);
+		},
+		count: function(children) {
+			var n = 0;
+			mapChildren(children, function() {
+				n++;
+			});
+			return n;
+		},
+		toArray: function(children) {
+			return mapChildren(children, function(child) {
+				return child;
+			}) || [];
+		},
+		only: function(children) {
+			if (!isValidElement(children)) throw Error("React.Children.only expected to receive a single React element child.");
+			return children;
+		}
+	};
+	exports.Activity = REACT_ACTIVITY_TYPE;
+	exports.Children = Children;
+	exports.Component = Component;
+	exports.Fragment = REACT_FRAGMENT_TYPE;
+	exports.Profiler = REACT_PROFILER_TYPE;
+	exports.PureComponent = PureComponent;
+	exports.StrictMode = REACT_STRICT_MODE_TYPE;
+	exports.Suspense = REACT_SUSPENSE_TYPE;
+	exports.ViewTransition = REACT_VIEW_TRANSITION_TYPE;
+	exports.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+	exports.__COMPILER_RUNTIME = {
+		__proto__: null,
+		c: function(size) {
+			return ReactSharedInternals.H.useMemoCache(size);
+		}
+	};
+	exports.addTransitionType = addTransitionType;
+	exports.cache = function(fn) {
+		return function() {
+			return fn.apply(null, arguments);
+		};
+	};
+	exports.cacheSignal = function() {
+		return null;
+	};
+	exports.cloneElement = function(element, config, children) {
+		if (null === element || void 0 === element) throw Error("The argument must be a React element, but you passed " + element + ".");
+		var props = assign({}, element.props), key = element.key;
+		if (null != config) for (propName in void 0 !== config.key && (key = "" + config.key), config) !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+		var propName = arguments.length - 2;
+		if (1 === propName) props.children = children;
+		else if (1 < propName) {
+			for (var childArray = Array(propName), i = 0; i < propName; i++) childArray[i] = arguments[i + 2];
+			props.children = childArray;
+		}
+		return ReactElement(element.type, key, props);
+	};
+	exports.createContext = function(defaultValue) {
+		defaultValue = {
+			$$typeof: REACT_CONTEXT_TYPE,
+			_currentValue: defaultValue,
+			_currentValue2: defaultValue,
+			_threadCount: 0,
+			Provider: null,
+			Consumer: null
+		};
+		defaultValue.Provider = defaultValue;
+		defaultValue.Consumer = {
+			$$typeof: REACT_CONSUMER_TYPE,
+			_context: defaultValue
+		};
+		return defaultValue;
+	};
+	exports.createElement = function(type, config, children) {
+		var propName, props = {}, key = null;
+		if (null != config) for (propName in void 0 !== config.key && (key = "" + config.key), config) hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
+		var childrenLength = arguments.length - 2;
+		if (1 === childrenLength) props.children = children;
+		else if (1 < childrenLength) {
+			for (var childArray = Array(childrenLength), i = 0; i < childrenLength; i++) childArray[i] = arguments[i + 2];
+			props.children = childArray;
+		}
+		if (type && type.defaultProps) for (propName in childrenLength = type.defaultProps, childrenLength) void 0 === props[propName] && (props[propName] = childrenLength[propName]);
+		return ReactElement(type, key, props);
+	};
+	exports.createRef = function() {
+		return { current: null };
+	};
+	exports.forwardRef = function(render) {
+		return {
+			$$typeof: REACT_FORWARD_REF_TYPE,
+			render
+		};
+	};
+	exports.isValidElement = isValidElement;
+	exports.lazy = function(ctor) {
+		return {
+			$$typeof: REACT_LAZY_TYPE,
+			_payload: {
+				_status: -1,
+				_result: ctor
+			},
+			_init: lazyInitializer
+		};
+	};
+	exports.memo = function(type, compare) {
+		return {
+			$$typeof: REACT_MEMO_TYPE,
+			type,
+			compare: void 0 === compare ? null : compare
+		};
+	};
+	exports.startTransition = startTransition;
+	exports.unstable_useCacheRefresh = function() {
+		return ReactSharedInternals.H.useCacheRefresh();
+	};
+	exports.use = function(usable) {
+		return ReactSharedInternals.H.use(usable);
+	};
+	exports.useActionState = function(action, initialState, permalink) {
+		return ReactSharedInternals.H.useActionState(action, initialState, permalink);
+	};
+	exports.useCallback = function(callback, deps) {
+		return ReactSharedInternals.H.useCallback(callback, deps);
+	};
+	exports.useContext = function(Context) {
+		return ReactSharedInternals.H.useContext(Context);
+	};
+	exports.useDebugValue = function() {};
+	exports.useDeferredValue = function(value, initialValue) {
+		return ReactSharedInternals.H.useDeferredValue(value, initialValue);
+	};
+	exports.useEffect = function(create, deps) {
+		return ReactSharedInternals.H.useEffect(create, deps);
+	};
+	exports.useEffectEvent = function(callback) {
+		return ReactSharedInternals.H.useEffectEvent(callback);
+	};
+	exports.useId = function() {
+		return ReactSharedInternals.H.useId();
+	};
+	exports.useImperativeHandle = function(ref, create, deps) {
+		return ReactSharedInternals.H.useImperativeHandle(ref, create, deps);
+	};
+	exports.useInsertionEffect = function(create, deps) {
+		return ReactSharedInternals.H.useInsertionEffect(create, deps);
+	};
+	exports.useLayoutEffect = function(create, deps) {
+		return ReactSharedInternals.H.useLayoutEffect(create, deps);
+	};
+	exports.useMemo = function(create, deps) {
+		return ReactSharedInternals.H.useMemo(create, deps);
+	};
+	exports.useOptimistic = function(passthrough, reducer) {
+		return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
+	};
+	exports.useReducer = function(reducer, initialArg, init) {
+		return ReactSharedInternals.H.useReducer(reducer, initialArg, init);
+	};
+	exports.useRef = function(initialValue) {
+		return ReactSharedInternals.H.useRef(initialValue);
+	};
+	exports.useState = function(initialState) {
+		return ReactSharedInternals.H.useState(initialState);
+	};
+	exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+		return ReactSharedInternals.H.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+	};
+	exports.useTransition = function() {
+		return ReactSharedInternals.H.useTransition();
+	};
+	exports.version = "19.3.0";
+}));
+//#endregion
+//#region node_modules/react/index.js
+var require_react = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	module.exports = require_react_production();
+}));
+//#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/not-found.js
 /** Determine if a value is a TanStack Router not-found error. */
 function isNotFound(obj) {
@@ -46,10 +437,14 @@ function redirect(opts) {
 function isRedirect(obj) {
 	return obj instanceof Response && !!obj.options;
 }
+/** Parse a serialized redirect object back into a redirect Response. */
+function parseRedirect(obj) {
+	if (obj !== null && typeof obj === "object" && obj.isSerializedRedirect) return redirect(obj);
+}
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/ssr/ssr-match-id.js
 function dehydrateSsrMatchId(id) {
-	return id.replaceAll("~", "~~").replaceAll("\0", "~0").replaceAll("�", "~r").replaceAll("/", "\0");
+	return id.replaceAll("/", "#");
 }
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/utils.js
@@ -329,9 +724,10 @@ function resolvePath(base, to, trailingSlash = "never", cache) {
 			if (value === "") {
 				if (!index) baseSegments = [value];
 				else if (index === length - 1) baseSegments.push(value);
-			} else if (value === "..") if (baseSegments.length > 1) baseSegments.pop();
-			else baseSegments = [""];
-			else if (value === ".") {} else baseSegments.push(value);
+			} else if (value === "..") {
+				if (baseSegments.length > 1) baseSegments.pop();
+				else baseSegments = [""];
+			} else if (value === ".") {} else baseSegments.push(value);
 		}
 	}
 	if (baseSegments.length > 1) {
@@ -465,7 +861,7 @@ function getParamNames(data) {
 }
 /** Parse one segment for matching and retain the same record for interpolation. */
 function parseSegment(path, start, end) {
-	const part = path.substring(start, end);
+	const part = path.slice(start, end);
 	if (part.charCodeAt(0) === 36) return part.length === 1 ? [
 		2,
 		"_splat",
@@ -473,7 +869,7 @@ function parseSegment(path, start, end) {
 		void 0
 	] : [
 		1,
-		part.substring(1),
+		part.slice(1),
 		"",
 		""
 	];
@@ -483,12 +879,12 @@ function parseSegment(path, start, end) {
 		const optional = part.charCodeAt(open + 1) === 45;
 		const nameStart = open + (optional ? 3 : 2);
 		if (close >= 0 && part.charCodeAt(nameStart - 1) === 36 && (!optional || nameStart < close)) {
-			const key = part.substring(nameStart, close);
+			const key = part.slice(nameStart, close);
 			return [
 				optional ? 3 : key ? 1 : 2,
 				key || "_splat",
-				part.substring(0, open),
-				path.substring(start + close + 1, key ? end : path.length)
+				part.slice(0, open),
+				path.slice(start + close + 1, key ? end : path.length)
 			];
 		}
 	}
@@ -549,7 +945,7 @@ function parseSegments(defaultCaseSensitive, route, start, node, dynamicListsToS
 				cursor = end + 1;
 			}
 			if (interpolation && literalStart < end) {
-				if (literalStart < start - 1) interpolation.push(path.substring(literalStart, start - 1));
+				if (literalStart < start - 1) interpolation.push(path.slice(literalStart, start - 1));
 				segment[2] = "/" + prefix;
 				if (kind === 2 && segment[3] !== void 0 && literalEnd < length) segment[3] = suffix.slice(0, -1);
 				interpolation.push(segment);
@@ -573,7 +969,7 @@ function parseSegments(defaultCaseSensitive, route, start, node, dynamicListsToS
 		}
 		node = nextNode;
 	}
-	if (interpolation && literalStart < literalEnd) interpolation.push(path.substring(literalStart, literalEnd));
+	if (interpolation && literalStart < literalEnd) interpolation.push(path.slice(literalStart, literalEnd));
 	const segmentData = interpolation?.slice();
 	if (!node) return segmentData;
 	if (parseParams && route.children && !route.isRoot && route.id && route.id.charCodeAt(route.id.lastIndexOf("/") + 1) === 95) {
@@ -1131,7 +1527,7 @@ var defaultStringifySearch = stringifySearchWith(JSON.stringify, JSON.parse);
 function parseSearchWith(parser) {
 	const isJsonParser = parser === JSON.parse;
 	return (searchStr) => {
-		if (searchStr[0] === "?") searchStr = searchStr.substring(1);
+		if (searchStr[0] === "?") searchStr = searchStr.slice(1);
 		const query = decode(searchStr);
 		for (const key in query) {
 			const value = query[key];
@@ -1343,7 +1739,7 @@ var RouterCore = class {
 	*/
 	constructor(options, getStoreConfig) {
 		this.tempLocationKey = `${Math.round(Math.random() * 1e7)}`;
-		this._scroll = { next: true };
+		this._scroll = { n: true };
 		this.subscribers = /* @__PURE__ */ new Set();
 		this._cache = /* @__PURE__ */ new Map();
 		this._committed = [];
@@ -1359,7 +1755,9 @@ var RouterCore = class {
 			};
 			this.isServer = this.options.isServer ?? true ?? typeof document === "undefined";
 			this.protocolAllowlist = new Set(this.options.protocolAllowlist);
-			if (!this.history || this.options.history && this.options.history !== this.history) if (!this.options.history) {} else this.history = this.options.history;
+			if (!this.history || this.options.history && this.options.history !== this.history) {
+				if (!this.options.history) {} else this.history = this.options.history;
+			}
 			this.origin = this.options.origin;
 			if (!this.origin) this.origin = "http://localhost";
 			const nextBasepath = this.options.basepath ?? "/";
@@ -1493,14 +1891,12 @@ var RouterCore = class {
 						hash: parsed.hash.slice(1)
 					};
 				}
-				const currentLocation = dest._fromLocation || this._pendingLocation || this.latestLocation;
+				const currentLocation = opts._fromLocation || this._pendingLocation || this.latestLocation;
 				let lightweight;
 				const current = () => {
 					return currentLocation;
 				};
-				const currentMatch = () => {
-					return lightweight ??= this.matchRoutesLightweight(currentLocation);
-				};
+				const currentMatch = () => lightweight ??= this.matchRoutesLightweight(current());
 				const to = dest.to ? `${dest.to}` : ".";
 				const nextTo = resolvePath(to[0] === "/" ? "" : dest.unsafeRelative === "path" ? current().pathname : dest.from ?? currentMatch()[1], to, this.options.trailingSlash, this.resolvePathCache);
 				const destRoute = this.routesByPath[trimPathRight(nextTo)];
@@ -1625,10 +2021,10 @@ var RouterCore = class {
 			this._cache.forEach(consider);
 			preloads?.forEach((matches) => matches.forEach(consider));
 			this._tx?.[3].forEach(consider);
-			const discardedPreloads = [];
+			const abort = [];
 			for (const [controller, matches] of preloads ?? []) if (matches.some((match) => invalidIds.has(match.id))) {
 				preloads.delete(controller);
-				discardedPreloads.push(controller);
+				abort.push(controller);
 			}
 			const invalidate = (d) => {
 				if (invalidIds.has(d.id)) {
@@ -1651,8 +2047,12 @@ var RouterCore = class {
 				match.invalid = true;
 				if (opts?.forcePending) match.status = "pending";
 			}
-			for (const id of invalidIds) this._flights?.delete(id);
-			for (const controller of discardedPreloads) controller.abort();
+			for (const id of invalidIds) {
+				const flight = this._flights?.get(id);
+				this._flights?.delete(id);
+				if (flight && !flight[2]) abort.push(flight[1]);
+			}
+			for (const controller of abort) controller.abort();
 			this.shouldViewTransition = false;
 			return this.load({ sync: opts?.sync });
 		};
@@ -1761,8 +2161,10 @@ var RouterCore = class {
 		const [initialMatchedRoutes, rawParams, foundRoute] = this.getMatchedRoutes(next.pathname);
 		let matchedRoutes = initialMatchedRoutes;
 		let isGlobalNotFound = false;
-		if (foundRoute ? foundRoute.path !== "/" && rawParams["**"] : trimPathRight(next.pathname)) if (this.options.notFoundRoute) matchedRoutes = [...matchedRoutes, this.options.notFoundRoute];
-		else isGlobalNotFound = true;
+		if (foundRoute ? foundRoute.path !== "/" && rawParams["**"] : trimPathRight(next.pathname)) {
+			if (this.options.notFoundRoute) matchedRoutes = [...matchedRoutes, this.options.notFoundRoute];
+			else isGlobalNotFound = true;
+		}
 		const _notFoundRouteId = isGlobalNotFound ? findGlobalNotFoundRouteId(this.options.notFoundMode, matchedRoutes) : void 0;
 		const matches = new Array(matchedRoutes.length);
 		const committed = this._committed;
@@ -2025,8 +2427,10 @@ function preloadComponent(route, type) {
 function loadComponents(route, onPendingReady) {
 	const component = preloadComponent(route, "component");
 	let pending = preloadComponent(route, "pendingComponent");
-	if (onPendingReady) if (pending) pending = pending.then(onPendingReady);
-	else onPendingReady();
+	if (onPendingReady) {
+		if (pending) pending = pending.then(onPendingReady);
+		else onPendingReady();
+	}
 	if (component && pending) return Promise.all([component, pending]).then(() => {});
 	return component ?? pending;
 }
@@ -2337,10 +2741,12 @@ function createLoaderTask$1(router, lane, index, tasks, semanticParent, options,
 			if (typeof configured === "function") configured = configured(getLoaderContext$1(router, lane, match, route, options[0], semanticParent, preload));
 			if (options[0].signal.aborted) reloadFailure = CANCELED_OUTCOME;
 		}
-		if (!reloadFailure) if (match.status !== "success") reload = true;
-		else {
-			const staleAge = preload || match.preload ? route.options.preloadStaleTime ?? router.options.defaultPreloadStaleTime ?? 3e4 : route.options.staleTime ?? router.options.defaultStaleTime ?? 0;
-			reload = !!(match.invalid || configured || configured === void 0 && Date.now() - match.updatedAt >= staleAge && (options[5] || match.cause === "enter" || options[2].some((candidate) => candidate.routeId === match.routeId && candidate.id !== match.id)));
+		if (!reloadFailure) {
+			if (match.status !== "success") reload = true;
+			else {
+				const staleAge = preload || match.preload ? route.options.preloadStaleTime ?? router.options.defaultPreloadStaleTime ?? 3e4 : route.options.staleTime ?? router.options.defaultStaleTime ?? 0;
+				reload = !!(match.invalid || configured || configured === void 0 && Date.now() - match.updatedAt >= staleAge && (options[5] || match.cause === "enter" || options[2].some((candidate) => candidate.routeId === match.routeId && candidate.id !== match.id)));
+			}
 		}
 	} catch (cause) {
 		match.invalid = true;
@@ -6347,8 +6753,6 @@ function useRouter(opts) {
 	if (!value);
 	return value;
 }
-//#endregion
-//#region node_modules/@tanstack/react-router/dist/esm/matchContext.js
 var matchContext = import_react.createContext(void 0);
 var dummyMatchContext = import_react.createContext(void 0);
 //#endregion
@@ -6838,15 +7242,14 @@ function resolveExternalLink(to, protocolAllowlist) {
 	if (!protocolAllowlist.has(scheme)) return null;
 	return to;
 }
-function resolveIsActive(location, next, activeOptions, basepath, isHydrated) {
+function resolveIsActive(location, next, activeOptions, basepath) {
 	const currentPath = removeTrailingSlash(location.pathname, basepath);
 	const nextPath = removeTrailingSlash(next.pathname, basepath);
 	if (activeOptions?.exact ? currentPath !== nextPath : !(currentPath.startsWith(nextPath) && (currentPath.length === nextPath.length || currentPath[nextPath.length] === "/"))) return false;
 	if (activeOptions?.includeSearch ?? true) {
 		if (!deepEqual(location.search, next.search, !activeOptions?.exact, activeOptions?.explicitUndefined)) return false;
 	}
-	if (activeOptions?.includeHash) return isHydrated && location.hash === next.hash;
-	return true;
+	return !activeOptions?.includeHash || location.hash === next.hash;
 }
 function useLinkProps(options, forwardedRef, host) {
 	return getServerLinkProps(useRouter(), options, forwardedRef, host);
@@ -6862,7 +7265,6 @@ var ROUTER_OPTION_KEYS = /* @__PURE__ */ new Set([
 	"mask",
 	"from",
 	"unsafeRelative",
-	"_fromLocation",
 	"reloadDocument",
 	"preload",
 	"preloadDelay",
@@ -6923,7 +7325,7 @@ function getServerLinkProps(router, options, forwardedRef, host) {
 		props.href = externalLink;
 		return props;
 	}
-	return applyLinkState(props, options, !!next && !(!disabled && !hrefOption) && resolveIsActive(router.stores.location.get(), next, activeOptions, router.basepath, false), hrefOption, linkDisabled, host);
+	return applyLinkState(props, options, !!next && !(!disabled && !hrefOption) && !activeOptions?.includeHash && resolveIsActive(router.stores.location.get(), next, activeOptions, router.basepath), hrefOption, linkDisabled, host);
 }
 function getHrefOption(next, router, disabled) {
 	if (disabled) return;
@@ -7153,8 +7555,10 @@ function lazyRouteComponent(importer, exportName) {
 			if (isModuleNotFoundError(error) && false);
 			throw error;
 		}
-		if (!comp) if (reactUse) reactUse(load());
-		else throw load();
+		if (!comp) {
+			if (reactUse) reactUse(load());
+			else throw load();
+		}
 		return import_react.createElement(comp, props);
 	};
 	lazyComp.preload = load;
@@ -7194,11 +7598,6 @@ function ScriptOnce({ children }) {
 		nonce: router.options.ssr?.nonce,
 		dangerouslySetInnerHTML: { __html: children + ";document.currentScript.remove()" }
 	});
-}
-//#endregion
-//#region node_modules/@tanstack/react-router/dist/esm/SafeFragment.js
-function SafeFragment(props) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: props.children });
 }
 //#endregion
 //#region node_modules/@tanstack/react-router/dist/esm/renderRouteNotFound.js
@@ -7253,49 +7652,54 @@ function renderPending(router, route) {
 var canWrapInSuspense = (router, route, ssr) => !route.isRoot || route.options.shellComponent || route.options.wrapInSuspense || ssr === false || ssr === "data-only" || false;
 var Match = import_react.memo(function MatchImpl({ routeId }) {
 	const router = useRouter();
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchView, {
-		router,
-		match: router.stores.byRoute.get(routeId).get()
-	});
+	return matchView(router, router.stores.byRoute.get(routeId).get());
 });
-function MatchView({ router, match }) {
+function matchView(router, match) {
 	const route = router.routesById[match.routeId];
 	const pendingElement = renderPending(router, route);
 	const routeErrorComponent = route.options.errorComponent ?? router.options.defaultErrorComponent;
 	const routeOnCatch = route.options.onCatch ?? router.options.defaultOnCatch;
 	const routeNotFoundComponent = route.isRoot ? route.options.notFoundComponent ?? router.options.notFoundRoute?.options.component : route.options.notFoundComponent;
 	const resolvedNoSsr = match.ssr === false || match.ssr === "data-only";
-	const ResolvedSuspenseBoundary = canWrapInSuspense(router, route, match.ssr) && (route.options.wrapInSuspense ?? pendingElement ?? (route.options.errorComponent?.preload || resolvedNoSsr)) ? import_react.Suspense : SafeFragment;
-	const ResolvedCatchBoundary = routeErrorComponent ? CatchBoundary : SafeFragment;
-	const ResolvedNotFoundBoundary = routeNotFoundComponent ? CatchNotFound : SafeFragment;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(route.isRoot ? route.options.shellComponent ?? SafeFragment : SafeFragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(matchContext.Provider, {
+	const wrapInSuspense = canWrapInSuspense(router, route, match.ssr) && (route.options.wrapInSuspense ?? pendingElement ?? (route.options.errorComponent?.preload || resolvedNoSsr));
+	let content = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchInner, { match });
+	if (resolvedNoSsr) content = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ClientOnly, {
+		fallback: pendingElement,
+		children: content
+	});
+	if (routeNotFoundComponent) content = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CatchNotFound, {
+		fallback: (error) => {
+			error.routeId ??= match.routeId;
+			if (error.routeId !== match.routeId) throw error;
+			return import_react.createElement(routeNotFoundComponent, error);
+		},
+		children: content
+	});
+	if (routeErrorComponent) content = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CatchBoundary, {
+		getResetKey: () => match,
+		errorComponent: routeErrorComponent,
+		onCatch: (error, errorInfo) => {
+			if (isNotFound(error)) {
+				error.routeId ??= match.routeId;
+				throw error;
+			}
+			routeOnCatch?.(error, errorInfo);
+		},
+		children: content
+	});
+	if (wrapInSuspense) content = /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react.Suspense, {
+		fallback: pendingElement,
+		children: content
+	});
+	const scrollRestoration = route.parentRoute?.id === "__root__" && router.options.scrollRestoration ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollRestoration, {}) : null;
+	const ShellComponent = route.isRoot && route.options.shellComponent;
+	return ShellComponent ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(matchContext.Provider, {
 		value: match.routeId,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResolvedSuspenseBoundary, {
-			fallback: pendingElement,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResolvedCatchBoundary, {
-				getResetKey: () => match,
-				errorComponent: routeErrorComponent,
-				onCatch: (error, errorInfo) => {
-					if (isNotFound(error)) {
-						error.routeId ??= match.routeId;
-						throw error;
-					}
-					routeOnCatch?.(error, errorInfo);
-				},
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResolvedNotFoundBoundary, {
-					fallback: (error) => {
-						error.routeId ??= match.routeId;
-						if (error.routeId !== match.routeId) throw error;
-						return import_react.createElement(routeNotFoundComponent, error);
-					},
-					children: resolvedNoSsr ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ClientOnly, {
-						fallback: pendingElement,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchInner, { match })
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchInner, { match })
-				})
-			})
-		})
-	}), route.parentRoute?.id === "__root__" && router.options.scrollRestoration ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollRestoration, {}) : null] });
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ShellComponent, { children: [content, scrollRestoration] })
+	}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(matchContext.Provider, {
+		value: match.routeId,
+		children: [content, scrollRestoration]
+	});
 }
 var MatchInner = import_react.memo(function MatchInnerImpl({ match }) {
 	const router = useRouter();
@@ -7331,11 +7735,14 @@ var MatchInner = import_react.memo(function MatchInnerImpl({ match }) {
 		return renderPending(router, route);
 	}
 	if (match.status === "notFound") return renderRouteNotFound(router, route, match.error);
-	if (match.status === "error") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)((route.options.errorComponent ?? router.options.defaultErrorComponent) || ErrorComponent, {
-		error: match.error,
-		reset: void 0,
-		info: { componentStack: "" }
-	});
+	if (match.status === "error") {
+		const RouteErrorComponent = (route.options.errorComponent ?? router.options.defaultErrorComponent) || ErrorComponent;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RouteErrorComponent, {
+			error: match.error,
+			reset: void 0,
+			info: { componentStack: "" }
+		});
+	}
 	return out;
 });
 /**
@@ -7383,12 +7790,8 @@ function settleOwner(owner, rendered) {
 function Matches() {
 	const router = useRouter();
 	const rootRoute = router.routesById[rootRouteId];
-	const pendingElement = renderPending(router, rootRoute);
-	const ResolvedSuspense = SafeFragment;
-	const inner = /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [false, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResolvedSuspense, {
-		fallback: pendingElement,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchesInner, {})
-	})] });
+	renderPending(router, rootRoute);
+	const inner = /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [false, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MatchesInner, {})] });
 	return router.options.InnerWrap ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(router.options.InnerWrap, { children: inner }) : inner;
 }
 function MatchesInner() {
@@ -7401,13 +7804,10 @@ function MatchesInner() {
 		if (acknowledgement[0] === matches) settleOwner(acknowledgement, true);
 	}, [acknowledgement, matches]);
 	const matchComponent = routeId ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Match, { routeId }) : null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(matchContext.Provider, {
-		value: routeId,
-		children: router.options.disableGlobalCatchBoundary ? matchComponent : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CatchBoundary, {
-			getResetKey: () => match,
-			onCatch: void 0,
-			children: matchComponent
-		})
+	return router.options.disableGlobalCatchBoundary ? matchComponent : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CatchBoundary, {
+		getResetKey: () => match,
+		onCatch: void 0,
+		children: matchComponent
 	});
 }
 //#endregion
@@ -7602,8 +8002,10 @@ function buildTagsFromMatches(router, nonce, matches, assetCrossOrigin) {
 			} catch {}
 			else {
 				const attribute = m.name ?? m.property;
-				if (attribute) if (metaByAttribute[attribute]) continue;
-				else metaByAttribute[attribute] = true;
+				if (attribute) {
+					if (metaByAttribute[attribute]) continue;
+					else metaByAttribute[attribute] = true;
+				}
 				resultMeta.push({
 					tag: "meta",
 					attrs: {
@@ -7748,173 +8150,6 @@ function renderScripts(scripts) {
 	})) });
 }
 //#endregion
-//#region node_modules/react-dom/cjs/react-dom.production.js
-/**
-* @license React
-* react-dom.production.js
-*
-* Copyright (c) Meta Platforms, Inc. and affiliates.
-*
-* This source code is licensed under the MIT license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-var require_react_dom_production = /* @__PURE__ */ __commonJSMin(((exports) => {
-	var React = require_react();
-	function formatProdErrorMessage(code) {
-		var url = "https://react.dev/errors/" + code;
-		if (1 < arguments.length) {
-			url += "?args[]=" + encodeURIComponent(arguments[1]);
-			for (var i = 2; i < arguments.length; i++) url += "&args[]=" + encodeURIComponent(arguments[i]);
-		}
-		return "Minified React error #" + code + "; visit " + url + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
-	}
-	function noop() {}
-	var Internals = {
-		d: {
-			f: noop,
-			r: function() {
-				throw Error(formatProdErrorMessage(522));
-			},
-			D: noop,
-			C: noop,
-			L: noop,
-			m: noop,
-			X: noop,
-			S: noop,
-			M: noop
-		},
-		p: 0,
-		findDOMNode: null
-	};
-	var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-	var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
-	var REACT_OPTIMISTIC_KEY = Symbol.for("react.optimistic_key");
-	function createPortal$1(children, containerInfo, implementation) {
-		var key = 3 < arguments.length && void 0 !== arguments[3] ? arguments[3] : null;
-		return {
-			$$typeof: REACT_PORTAL_TYPE,
-			key: null == key ? null : key === REACT_OPTIMISTIC_KEY ? REACT_OPTIMISTIC_KEY : "" + key,
-			children,
-			containerInfo,
-			implementation
-		};
-	}
-	var ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
-	function getCrossOriginStringAs(as, input) {
-		if ("font" === as) return "";
-		if ("string" === typeof input) return "use-credentials" === input ? input : "";
-	}
-	exports.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = Internals;
-	exports.browser = function(reason) {
-		return {
-			$$typeof: REACT_RECOVERABLE_TYPE,
-			_reason: reason
-		};
-	};
-	exports.createPortal = function(children, container) {
-		var key = 2 < arguments.length && void 0 !== arguments[2] ? arguments[2] : null;
-		if (!container || 1 !== container.nodeType && 9 !== container.nodeType && 11 !== container.nodeType) throw Error(formatProdErrorMessage(299));
-		return createPortal$1(children, container, null, key);
-	};
-	exports.flushSync = function(fn) {
-		var previousTransition = ReactSharedInternals.T, previousUpdatePriority = Internals.p;
-		try {
-			if (ReactSharedInternals.T = null, Internals.p = 2, fn) return fn();
-		} finally {
-			ReactSharedInternals.T = previousTransition, Internals.p = previousUpdatePriority, Internals.d.f();
-		}
-	};
-	exports.preconnect = function(href, options) {
-		"string" === typeof href && (options ? (options = options.crossOrigin, options = "string" === typeof options ? "use-credentials" === options ? options : "" : void 0) : options = null, Internals.d.C(href, options));
-	};
-	exports.prefetchDNS = function(href) {
-		"string" === typeof href && Internals.d.D(href);
-	};
-	exports.preinit = function(href, options) {
-		if ("string" === typeof href && options && "string" === typeof options.as) {
-			var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin), integrity = "string" === typeof options.integrity ? options.integrity : void 0, fetchPriority = "string" === typeof options.fetchPriority ? options.fetchPriority : void 0;
-			"style" === as ? Internals.d.S(href, "string" === typeof options.precedence ? options.precedence : void 0, {
-				crossOrigin,
-				integrity,
-				fetchPriority
-			}) : "script" === as && Internals.d.X(href, {
-				crossOrigin,
-				integrity,
-				fetchPriority,
-				nonce: "string" === typeof options.nonce ? options.nonce : void 0
-			});
-		}
-	};
-	exports.preinitModule = function(href, options) {
-		if ("string" === typeof href) if ("object" === typeof options && null !== options) {
-			if (null == options.as || "script" === options.as) {
-				var crossOrigin = getCrossOriginStringAs(options.as, options.crossOrigin);
-				Internals.d.M(href, {
-					crossOrigin,
-					integrity: "string" === typeof options.integrity ? options.integrity : void 0,
-					nonce: "string" === typeof options.nonce ? options.nonce : void 0,
-					fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0
-				});
-			}
-		} else options ?? Internals.d.M(href);
-	};
-	exports.preload = function(href, options) {
-		if ("string" === typeof href && "object" === typeof options && null !== options && "string" === typeof options.as) {
-			var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin);
-			Internals.d.L(href, as, {
-				crossOrigin,
-				integrity: "string" === typeof options.integrity ? options.integrity : void 0,
-				nonce: "string" === typeof options.nonce ? options.nonce : void 0,
-				type: "string" === typeof options.type ? options.type : void 0,
-				fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0,
-				referrerPolicy: "string" === typeof options.referrerPolicy ? options.referrerPolicy : void 0,
-				imageSrcSet: "string" === typeof options.imageSrcSet ? options.imageSrcSet : void 0,
-				imageSizes: "string" === typeof options.imageSizes ? options.imageSizes : void 0,
-				media: "string" === typeof options.media ? options.media : void 0
-			});
-		}
-	};
-	exports.preloadModule = function(href, options) {
-		if ("string" === typeof href) if (options) {
-			var crossOrigin = getCrossOriginStringAs(options.as, options.crossOrigin);
-			Internals.d.m(href, {
-				as: "string" === typeof options.as && "script" !== options.as ? options.as : void 0,
-				crossOrigin,
-				integrity: "string" === typeof options.integrity ? options.integrity : void 0,
-				nonce: "string" === typeof options.nonce ? options.nonce : void 0,
-				fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0
-			});
-		} else Internals.d.m(href);
-	};
-	exports.requestFormReset = function(form) {
-		Internals.d.r(form);
-	};
-	exports.unstable_batchedUpdates = function(fn, a) {
-		return fn(a);
-	};
-	exports.useFormState = function(action, initialState, permalink) {
-		return ReactSharedInternals.H.useFormState(action, initialState, permalink);
-	};
-	exports.useFormStatus = function() {
-		return ReactSharedInternals.H.useHostTransitionStatus();
-	};
-	exports.version = "19.3.0";
-}));
-//#endregion
-//#region node_modules/react-dom/index.js
-var require_react_dom = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	function checkDCE() {
-		if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") return;
-		try {
-			__REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(checkDCE);
-		} catch (err) {
-			console.error(err);
-		}
-	}
-	checkDCE();
-	module.exports = require_react_dom_production();
-}));
-//#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/ssr/constants.js
 var GLOBAL_TSR = "$_TSR";
 //#endregion
@@ -7939,18 +8174,20 @@ function advanceByteMatcher(matcher, value, startIndex = 0, findLast = false) {
 	let lastMatchEnd;
 	let index = startIndex;
 	while (index < value.length) {
-		if (matched === 0) if (anchorIndex > 0 && index < value.length - anchorIndex) {
-			const anchor = value.indexOf(pattern[anchorIndex], index + anchorIndex);
-			if (anchor < 0) {
-				index = value.length - anchorIndex;
-				continue;
-			}
-			index = anchor - anchorIndex;
-		} else {
-			index = value.indexOf(pattern[0], index);
-			if (index < 0) {
-				matcher.matched = matched;
-				return lastMatchEnd;
+		if (matched === 0) {
+			if (anchorIndex > 0 && index < value.length - anchorIndex) {
+				const anchor = value.indexOf(pattern[anchorIndex], index + anchorIndex);
+				if (anchor < 0) {
+					index = value.length - anchorIndex;
+					continue;
+				}
+				index = anchor - anchorIndex;
+			} else {
+				index = value.indexOf(pattern[0], index);
+				if (index < 0) {
+					matcher.matched = matched;
+					return lastMatchEnd;
+				}
 			}
 		}
 		const byte = value[index];
@@ -8372,13 +8609,17 @@ function createHydrationScripts(nonce, initialSources) {
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/ssr/handlerCallback.js
 function isSsrResponse(value) {
-	return typeof value === "object" && value !== null && "response" in value && "serverSsrCleanup" in value;
+	if (typeof value !== "object" || value === null || !("response" in value) || !(value.response instanceof Response) || !("serverSsrCleanup" in value)) return false;
+	if (value.serverSsrCleanup === "none") return true;
+	return value.serverSsrCleanup === "stream" && "dispose" in value && typeof value.dispose === "function";
 }
 function normalizeSsrResponse(result) {
-	return isSsrResponse(result) ? result : {
+	if (result instanceof Response) return {
 		response: result,
 		serverSsrCleanup: "none"
 	};
+	if (isSsrResponse(result)) return result;
+	throw new TypeError("Expected a Response from the SSR handler");
 }
 function cancelResponseBody(response, reason) {
 	const body = response.body;
@@ -8943,6 +9184,173 @@ function makeMergeStream(serverSsr, reader, hydrationOutput, opts) {
 	disarmLifecycle = armStreamLifecycle(serverSsr, opts, () => terminal, terminate);
 	return stream;
 }
+//#endregion
+//#region node_modules/react-dom/cjs/react-dom.production.js
+/**
+* @license React
+* react-dom.production.js
+*
+* Copyright (c) Meta Platforms, Inc. and affiliates.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+var require_react_dom_production = /* @__PURE__ */ __commonJSMin(((exports) => {
+	var React = require_react();
+	function formatProdErrorMessage(code) {
+		var url = "https://react.dev/errors/" + code;
+		if (1 < arguments.length) {
+			url += "?args[]=" + encodeURIComponent(arguments[1]);
+			for (var i = 2; i < arguments.length; i++) url += "&args[]=" + encodeURIComponent(arguments[i]);
+		}
+		return "Minified React error #" + code + "; visit " + url + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
+	}
+	function noop() {}
+	var Internals = {
+		d: {
+			f: noop,
+			r: function() {
+				throw Error(formatProdErrorMessage(522));
+			},
+			D: noop,
+			C: noop,
+			L: noop,
+			m: noop,
+			X: noop,
+			S: noop,
+			M: noop
+		},
+		p: 0,
+		findDOMNode: null
+	};
+	var REACT_PORTAL_TYPE = Symbol.for("react.portal");
+	var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
+	var REACT_OPTIMISTIC_KEY = Symbol.for("react.optimistic_key");
+	function createPortal$1(children, containerInfo, implementation) {
+		var key = 3 < arguments.length && void 0 !== arguments[3] ? arguments[3] : null;
+		return {
+			$$typeof: REACT_PORTAL_TYPE,
+			key: null == key ? null : key === REACT_OPTIMISTIC_KEY ? REACT_OPTIMISTIC_KEY : "" + key,
+			children,
+			containerInfo,
+			implementation
+		};
+	}
+	var ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+	function getCrossOriginStringAs(as, input) {
+		if ("font" === as) return "";
+		if ("string" === typeof input) return "use-credentials" === input ? input : "";
+	}
+	exports.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = Internals;
+	exports.browser = function(reason) {
+		return {
+			$$typeof: REACT_RECOVERABLE_TYPE,
+			_reason: reason
+		};
+	};
+	exports.createPortal = function(children, container) {
+		var key = 2 < arguments.length && void 0 !== arguments[2] ? arguments[2] : null;
+		if (!container || 1 !== container.nodeType && 9 !== container.nodeType && 11 !== container.nodeType) throw Error(formatProdErrorMessage(299));
+		return createPortal$1(children, container, null, key);
+	};
+	exports.flushSync = function(fn) {
+		var previousTransition = ReactSharedInternals.T, previousUpdatePriority = Internals.p;
+		try {
+			if (ReactSharedInternals.T = null, Internals.p = 2, fn) return fn();
+		} finally {
+			ReactSharedInternals.T = previousTransition, Internals.p = previousUpdatePriority, Internals.d.f();
+		}
+	};
+	exports.preconnect = function(href, options) {
+		"string" === typeof href && (options ? (options = options.crossOrigin, options = "string" === typeof options ? "use-credentials" === options ? options : "" : void 0) : options = null, Internals.d.C(href, options));
+	};
+	exports.prefetchDNS = function(href) {
+		"string" === typeof href && Internals.d.D(href);
+	};
+	exports.preinit = function(href, options) {
+		if ("string" === typeof href && options && "string" === typeof options.as) {
+			var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin), integrity = "string" === typeof options.integrity ? options.integrity : void 0, fetchPriority = "string" === typeof options.fetchPriority ? options.fetchPriority : void 0;
+			"style" === as ? Internals.d.S(href, "string" === typeof options.precedence ? options.precedence : void 0, {
+				crossOrigin,
+				integrity,
+				fetchPriority
+			}) : "script" === as && Internals.d.X(href, {
+				crossOrigin,
+				integrity,
+				fetchPriority,
+				nonce: "string" === typeof options.nonce ? options.nonce : void 0
+			});
+		}
+	};
+	exports.preinitModule = function(href, options) {
+		if ("string" === typeof href) if ("object" === typeof options && null !== options) {
+			if (null == options.as || "script" === options.as) {
+				var crossOrigin = getCrossOriginStringAs(options.as, options.crossOrigin);
+				Internals.d.M(href, {
+					crossOrigin,
+					integrity: "string" === typeof options.integrity ? options.integrity : void 0,
+					nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+					fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0
+				});
+			}
+		} else options ?? Internals.d.M(href);
+	};
+	exports.preload = function(href, options) {
+		if ("string" === typeof href && "object" === typeof options && null !== options && "string" === typeof options.as) {
+			var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin);
+			Internals.d.L(href, as, {
+				crossOrigin,
+				integrity: "string" === typeof options.integrity ? options.integrity : void 0,
+				nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+				type: "string" === typeof options.type ? options.type : void 0,
+				fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0,
+				referrerPolicy: "string" === typeof options.referrerPolicy ? options.referrerPolicy : void 0,
+				imageSrcSet: "string" === typeof options.imageSrcSet ? options.imageSrcSet : void 0,
+				imageSizes: "string" === typeof options.imageSizes ? options.imageSizes : void 0,
+				media: "string" === typeof options.media ? options.media : void 0
+			});
+		}
+	};
+	exports.preloadModule = function(href, options) {
+		if ("string" === typeof href) if (options) {
+			var crossOrigin = getCrossOriginStringAs(options.as, options.crossOrigin);
+			Internals.d.m(href, {
+				as: "string" === typeof options.as && "script" !== options.as ? options.as : void 0,
+				crossOrigin,
+				integrity: "string" === typeof options.integrity ? options.integrity : void 0,
+				nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+				fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0
+			});
+		} else Internals.d.m(href);
+	};
+	exports.requestFormReset = function(form) {
+		Internals.d.r(form);
+	};
+	exports.unstable_batchedUpdates = function(fn, a) {
+		return fn(a);
+	};
+	exports.useFormState = function(action, initialState, permalink) {
+		return ReactSharedInternals.H.useFormState(action, initialState, permalink);
+	};
+	exports.useFormStatus = function() {
+		return ReactSharedInternals.H.useHostTransitionStatus();
+	};
+	exports.version = "19.3.0";
+}));
+//#endregion
+//#region node_modules/react-dom/index.js
+var require_react_dom = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	function checkDCE() {
+		if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") return;
+		try {
+			__REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(checkDCE);
+		} catch (err) {
+			console.error(err);
+		}
+	}
+	checkDCE();
+	module.exports = require_react_dom_production();
+}));
 //#endregion
 //#region node_modules/react-dom/cjs/react-dom-server-legacy.node.production.js
 /**
@@ -17746,4 +18154,4 @@ var renderRouterToStream = async ({ request, router, responseHeaders, children }
 	}
 };
 //#endregion
-export { createInlineCssStyleAsset as A, decodePath as B, createStream as C, toCrossJSONAsync as D, isStream as E, waitForReason as F, rootRouteId as G, isPromise as H, _getRenderedMatches as I, isNotFound as K, executeRewriteInput as L, getStylesheetHref as M, resolveManifestAssetLink as N, toCrossJSONStream as O, resolveManifestCssLink as P, invariant as R, createPlugin as S, fromJSON as T, dehydrateSsrMatchId as U, isDangerousProtocol as V, isRedirect as W, lazyRouteComponent as _, isSsrResponse as a, useRouter as b, stripSsrResponseBody as c, require_react_dom as d, Scripts as f, Outlet as g, createRouter as h, disposeSsrResponse as i, getScriptPreloadAttrs as j, createInlineCssPlaceholderAsset as k, createHydrationScripts as l, RouterProvider as m, bindSsrResponseToRequest as n, normalizeSsrResponse as o, HeadContent as p, defineHandlerCallback as r, replaceSsrResponse as s, renderRouterToStream as t, GLOBAL_TSR as u, createFileRoute as v, crossSerializeStream as w, require_jsx_runtime as x, createRootRoute as y, createSieveCache as z };
+export { createInlineCssStyleAsset as A, decodePath as B, createStream as C, toCrossJSONAsync as D, isStream as E, waitForReason as F, parseRedirect as G, isPromise as H, _getRenderedMatches as I, require_react as J, rootRouteId as K, executeRewriteInput as L, getStylesheetHref as M, resolveManifestAssetLink as N, toCrossJSONStream as O, resolveManifestCssLink as P, invariant as R, createPlugin as S, fromJSON as T, dehydrateSsrMatchId as U, isDangerousProtocol as V, isRedirect as W, lazyRouteComponent as _, disposeSsrResponse as a, useRouter as b, replaceSsrResponse as c, GLOBAL_TSR as d, Scripts as f, Outlet as g, createRouter as h, defineHandlerCallback as i, getScriptPreloadAttrs as j, createInlineCssPlaceholderAsset as k, stripSsrResponseBody as l, RouterProvider as m, require_react_dom as n, isSsrResponse as o, HeadContent as p, isNotFound as q, bindSsrResponseToRequest as r, normalizeSsrResponse as s, renderRouterToStream as t, createHydrationScripts as u, createFileRoute as v, crossSerializeStream as w, require_jsx_runtime as x, createRootRoute as y, createSieveCache as z };

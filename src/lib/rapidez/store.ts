@@ -66,6 +66,10 @@ interface RapidezState {
   arrivedAt: number | null;
   rating: number;
   formError: string;
+  actingId: string;
+  offerCooldown: number;
+  useLive: boolean;
+  fleet: { id: string; name: string; lat: number; lng: number; elite: boolean }[];
   payout: Payout;
   mapSeq: number;
   mapCmd: MapCmd | null;
@@ -76,6 +80,7 @@ interface RapidezState {
   setDestRef: (value: string) => void;
   setMethod: (method: PayMethod) => void;
   setPayout: (patch: Partial<Payout>) => void;
+  setActing: (id: string) => void;
   confirmPickup: () => void;
   confirmDest: () => void;
   requestTrip: () => void;
@@ -138,6 +143,10 @@ export function youProfile(payout: Payout): DriverProfile {
 export const useRapidez = create<RapidezState>((set, get) => ({
   role: "passenger",
   online: false,
+  actingId: "you",
+  offerCooldown: 0,
+  useLive: false,
+  fleet: [],
   center: HOME,
   pickupRef: "",
   pickupLabel: "",
@@ -167,6 +176,7 @@ export const useRapidez = create<RapidezState>((set, get) => ({
       }
       return { payout };
     }),
+  setActing: (actingId) => set({ actingId, formError: "" }),
   setRating: (rating) => set({ rating }),
 
   confirmPickup: () => {
@@ -208,6 +218,7 @@ export const useRapidez = create<RapidezState>((set, get) => ({
       searchStartedAt: Date.now(),
       offerOpen: false,
       offerDeadline: null,
+      offerCooldown: 0,
       assigned: null,
       proximity: false,
       payStatus: "PENDING",
@@ -237,17 +248,18 @@ export const useRapidez = create<RapidezState>((set, get) => ({
 
   acceptOffer: () => {
     const s = get();
-    if (!s.pickup) return;
-    get().assignDriver(youProfile(s.payout), s.pickup);
+    if (!s.pickup || !s.online) return;
+    const driver = actingDriver(s.actingId, s.payout);
+    if (!driver.registered) return;
+    get().assignDriver(driver, s.pickup);
   },
 
   rejectOffer: () => {
-    const s = get();
-    if (s.phase === "searching" && s.pickup) {
-      get().assignDriver(nearestNpc(s.pickup), s.pickup);
-      return;
-    }
-    set({ offerOpen: false, offerDeadline: null });
+    set({
+      offerOpen: false,
+      offerDeadline: null,
+      offerCooldown: Date.now() + 8000,
+    });
   },
 
   markArrived: () => set({ phase: "arrived", proximity: true, arrivedAt: Date.now() }),
@@ -370,7 +382,11 @@ export const useRapidez = create<RapidezState>((set, get) => ({
     })),
 }));
 
-export function nearestNpc(pickup: LatLng): DriverProfile {
-  const ranked = [...NPCS].sort((a, b) => haversine(a.pos, pickup) - haversine(b.pos, pickup));
-  return ranked[0];
+export function actingDriver(actingId: string, payout: Payout): DriverProfile {
+  if (actingId === "you") return youProfile(payout);
+  return NPCS.find((driver) => driver.id === actingId) ?? youProfile(payout);
+}
+
+export function roster(payout: Payout): DriverProfile[] {
+  return [youProfile(payout), ...NPCS];
 }
