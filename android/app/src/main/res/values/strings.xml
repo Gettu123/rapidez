@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rapidez</string>
+    <string name="missing_url">Falta o endereço. Em local.properties escreve rapidez.url com o link publicado do Rapidez e volta a compilar.</string>
+</resources>
